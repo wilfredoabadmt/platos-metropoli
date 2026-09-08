@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votación El Plato Metrópoli - El Alto</title>
+    <meta name="description" content="Participa en la elección del Plato Metrópoli, la segunda versión del Plato Bandera de la ciudad de El Alto. ¡Vota por tu plato favorito en tiempo real!">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
+    <header class="app-header">
+        <div class="container">
+            <div class="logos">
+                <h2 class="institution">GAMEA</h2>
+                <h1 class="main-title">El Plato Metrópoli</h1>
+            </div>
+            <p class="subtitle">Segunda Versión del Plato Bandera de El Alto</p>
+            <div class="live-status">
+                <span class="pulsing-dot"></span> Votación en Vivo
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="voting-section">
+            <header class="section-header">
+                <h2>Elige tu plato favorito</h2>
+                <p>Haz clic en "Votar" para apoyar a tu plato preferido. Observa cómo sube en tiempo real.</p>
+            </header>
+
+            <div class="dishes-grid" id="dishes-grid">
+                <!-- Tarjetas generadas por JS -->
+            </div>
+        </section>
+
+        <section class="results-section">
+            <h2>Posiciones en Tiempo Real</h2>
+            <div class="ranking-container" id="ranking-container">
+                <!-- Barras generadas por JS -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <div class="container">
+            <p>Dirección de Comunicación • Unidad de Turismo • Dirección de Cultura</p>
+            <p>&copy; 2026 Gobierno Autónomo Municipal de El Alto</p>
+        </div>
+    </footer>
+
+    <!-- Custom Logic -->
+    <script src="app.js"></script>
+</body>
+</html>

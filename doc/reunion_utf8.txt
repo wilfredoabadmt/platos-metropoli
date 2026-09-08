@@ -1,0 +1,409 @@
+﻿**Hombre 1:** Ya, compañera, ¿en qué consiste el proyecto?, ¿cuál es la idea?
+
+**Mujer 1:** Ya, a ver. Estamos haciendo el segundo relanzamiento del plato bandera. En la gestión pasada de la anterior alcaldesa lo habían hecho, ¿ya?, igual en un tema de votación. Pero, como ustedes ya saben, ha salido un plato ganador, del cual nosotros queremos más o menos volver a relanzar; tal vez se cambie el plato, tal vez no. Ustedes saben que cada año...
+
+**Hombre 2:** ¿En ese entonces qué ha ganado?
+
+**Mujer 1:** El fiambre ha ganado.
+
+**Hombre 1:** La parte que más nos interesa a nosotros, licenciada, son las herramientas que necesitan. Fuera de los platos y todo, que yo sé que es lo más principal, ¿no?, son las herramientas que van a utilizar. Como nos dicen que han utilizado una plataforma en la gestión de Eva Copa: ¿qué tipo de plataforma habían utilizado?, ¿qué medios han utilizado para viralizar?, ¿qué medios han utilizado para que la población pueda acceder fácilmente y dar su votación y todo eso, ¿no ve? Porque yo supongo que ese debe ser el tema, ¿no ve?
+
+**Mujer 1:** Eh, no sabemos qué plataforma han utilizado; sin embargo, no queremos tampoco copiar, ¿no? Por eso es que...
+
+**Hombre 1:** Claro, es por eso también que no queremos recurrir a eso. Por ahí han utilizado Facebook, por ahí han utilizado TikTok, por ahí han hecho formularios; y nosotros, que mandemos lo mismo cambiando el logo de Copa a... no va, ¿no ve? O sea, tenemos que innovar.
+
+**Mujer 1:** Lo que había visto yo en las gestiones pasadas del plato bandera es que lo habían utilizado en Facebook, pero con los dibujitos y con emoticones de votación. Ahora lo que nosotros queremos es algo diferente, sacar casi similar a la que utiliza John Arandia. Hace con votaciones, ¿no ve?
+
+**Hombre 2:** No he visto el de John Arandia.
+
+**Hombre 1:** He visto una... no sé si han visto esta en las redes sociales que hacen concursos nacionales: plato de... por ejemplo, Bolivia gana con el pique macho contra un plato de Chile, y todos estaban felices de eso, ¿no ve? Pero ellos lo han hecho en vivo.
+
+**Mujer 1:** Similar a esta. Esta misma plataforma queremos más o menos, el que esté por votación y por día el conteo.
+
+**Mujer 2:** Y porque ahí se visualiza, ¿no?, el avance que uno tiene. Cuando vota, en ese mismo momento se marca, creo, ¿no ve?
+
+**Hombre 1:** Sí, sí, que se note ese rato, ¿no ve? Lo que se va avanzando. Haces clic y va subiendo, va subiendo.
+
+**Mujer 1:** Exacto. Entonces, para ser más dinámico y ya que se pueda ver, que no sea cerrado, digamos.
+
+**Hombre 2:** ¿Y esta plataforma de John Arandia en qué está?
+
+**Mujer 1:** En Facebook igual está.
+
+**Hombre 2:** En Facebook.
+
+**Mujer 1:** Ajá. Pero esa plataforma es la que nosotros queremos, digamos, utilizar para esto. Como se va a lanzar con cinco platos, entonces por esa razón: va a haber las cinco opciones y mientras van tiqueando, va a ir subiendo o va a ir bajando, dependiendo, ¿no?
+
+**Hombre 2:** Ya.
+
+**Hombre 1:** Sí, se puede. ¿Han hablado con Sistemas para ver la situación de las publicaciones en su servidor, si necesitamos algo?
+
+**Mujer 1:** Lo que me dijeron es que Comunicación está encargado. Por eso también me dijo: «Mandá tu nota y sí se puede hacer». Me dijeron, entonces por esa razón les mandaron.
+
+**Hombre 1:** Sí, porque ese tipo de votaciones solamente se hacen en Facebook; pues yo supongo que lo mismo le iba a hacer la Eva.
+
+**Mujer 1:** La Eva lo había hecho en una... ¿dónde está?
+
+**Mujer 2:** No he visto cómo lo ha hecho la Eva.
+
+**Mujer 1:** Hasta donde he visto era similar a esto. Similar, pero de ella era con tres platos variados con emoticones.
+
+**Hombre 2:** Al «me gusta», «me encanta», ¿así, no?
+
+**Mujer 1:** Y yo no quiero eso. O sea, lo que queremos, tanto como con el de Turismo también hemos hablado, que sea más...
+
+**Hombre 2:** Totalmente disruptivo que sea.
+
+**Mujer 1 / Mujer 2:** Sí, ¿no ve?
+
+**Hombre 2:** Y el de John Arandia, por ejemplo, a ver, muéstrame. Es una... es una encuesta en realidad.
+
+**Hombre 1:** Es una encuesta más que... Claro, es una encuesta. No es votación, es encuesta.
+
+**Hombre 2:** Sí, ¿y eso lo quieren adaptar, ¿no ve? Y ahí colocamos nuestros platitos y la gente: clic, clic, clic, clic, ¿no ve? Pero la desventaja, ¿saben cuál es de esto? Esto ya lo vamos a encabezar nosotros, ¿no ve? Va a estar en la parte superior para que la gente... La macana de esto es que no acompaña una imagen. Y eso ha sido, por ejemplo, de la Eva, buena: tienes un afiche y juegas, ¿no ve?, con los íconos, porque esa era la medición de la Eva. Una sonrisita tenía un plato, un corazoncito tenía otro plato, y así, ¿no ve? En este caso... sí, pues, esto es encuesta.
+
+**Mujer 1:** Ajá, es que como va a ser la votación...
+
+**Hombre 2:** ¿Y solamente quieren que saquemos en Facebook?
+
+**Mujer 1:** Sí. En el tema de TikTok queríamos poner solo el enlace nomás. Un *spot* y el enlace, nada más, para que se vaya enlazando directo.
+
+**Hombre 1:** ¿Y no sería más práctico sacarle un subdominio a nuestro dominio de elalto.gob.bo? Por ejemplo: platos.elalto.gob.bo. Es más práctico que darles una dirección en Facebook, ¿no ve? Porque en Facebook tienes que saber bien la...
+
+**Hombre 2:** ¿Por qué no le generamos una plataforma? O sea, hacemos, ¿no ve?, el afiche, ahí colocamos nuestro enlace vía QR —nosotros todo lo podemos hacer—, cosa que la gente ingrese y le va a llevar a una plataforma donde pueden votar así, ¡tac!, ¿no ve?
+
+**Hombre 1:** Sí, sí. Yo soy más práctico de...
+
+**Hombre 2:** Y en esa... ingresando a ese enlace a la gente le van a salir, ¿no ve?, las propuestas.
+
+**Mujer 2:** ¿Eso va a ser en Facebook o en ambos?
+
+**Hombre 2:** O sea, de allá solamente van a ser medios. Facebook y TikTok van a ser los medios.
+
+**Mujer 1:** Ya.
+
+**Hombre 2:** Pero la plataforma que vamos a crear va a salir así como esto, bien bonito, ¿no ve? Ahí va a estar: concurso tal, ¿no ve?, «Vote por su plato preferido», y ahí vamos a colocar los platos. E incluso lo que ellas sugieren: podemos colocar gráficamente quién está ganando, ¿no ve?
+
+**Mujer 1:** Exacto.
+
+**Hombre 2:** Con verdecito, ¿no ve?, cuántos ya tiene. Incluso tal vez se le pueda sacar su número.
+
+**Hombre 1:** En vivo se saca eso. Se saca en vivo, de eso no hay lío.
+
+**Mujer 1:** Sí, el número...
+
+**Hombre 2:** Claro, o sea, a medida que vayan cliqueando, dando su votación...
+
+**Hombre 1:** Se va a sumar lo que sube y baja. Es lo que quieren: que suba y baje. Si vos das un clic a un plato, vas a ver si ha subido un puntito o no ha subido un puntito, ¿no ve?
+
+**Mujer 2:** Incluso en el WhatsApp creo que igual aparece así cuando lanzas...
+
+**Hombre 2:** En WhatsApp igual se puede. Ajá, sí. Pero son encuestas eventuales. Yo sugiero eso para ti, cosa que nosotros podamos promocionar ese enlace tanto en Facebook como en TikTok.
+
+**Mujer 1:** Podría ser.
+
+**Hombre 2:** ¿No ve? Y sacamos bonitas artes.
+
+**Mujer 1:** Lo que te estoy entendiendo: tanto TikTok como Facebook van a ser los medios de difusión.
+
+**Hombre 2:** De difusión, para promocionar ese enlace.
+
+**Mujer 1:** Para que lleguen a esa plataforma.
+
+**Hombre 2:** Exacto.
+
+**Mujer 1:** Estaría bien.
+
+**Hombre 2:** Y la gente ingresa... hacerlo bien práctico: ingresa, ¡tac!, y le sale ya directamente para votar nomás.
+
+**Hombre 1:** Ya. ¿Qué tal? Para eso también les recomendaría que puedan ver la situación de hacer un Ads o trabajar con el tráfico de Meta para promocionar bien esta actividad, ¿no?
+
+**Mujer 2:** Va a haber una presentación donde van a estar los secretarios y directores, ¿no?, en primera instancia. Luego sí lo podemos hacer más dinámico, tal vez vía TikTok, sacar tanto con Turismo y Cultura...
+
+**Mujer 1:** Turismo, promocionar para que la gente se entere de que ahí está...
+
+**Hombre 1:** Es que en la promoción, cuando no se hacen las promociones directamente, sino orgánicamente —hablando de TikTok y Meta o de Facebook—, no se logra el alcance de la población que se quiere, ¿no ve? Lo mismo que yo he hecho para el Elíseo: ellos en una semana tenían 50.000 personas en tráfico; cuando yo he ingresado, he cuadruplicado eso de personas solamente de El Alto que han logrado ver y han dado al enlace para ver si les gusta o no les gusta el candidato. Entonces, siempre les recomiendo hacer un trabajo de Meta Ads con Facebook. Claro, eroga un gasto, pero no es mucho: yo gasto un dólar diario en todas mis promociones...
+
+**Hombre 2:** ¿Hasta cuándo es el concurso?
+
+**Mujer 1:** Un mes. El 16 lo vamos a lanzar, 16 de septiembre, y el 16 de octubre es donde vamos a cuantificar todo, en este mes.
+
+**Hombre 2:** El 16 estaríamos ya lanzando la invitación y promocionando básicamente el registro, el enlace y todo eso. ¿Y cuándo va a ser el fin?
+
+**Hombre 1 / Mujer 1:** El 16 de octubre.
+
+**Hombre 2:** Ah, va a ser un mes.
+
+**Hombre 1:** El 16 de octubre directamente van a dar los ganadores.
+
+**Mujer 1:** Sí, por eso estamos dando el lapso de un mes.
+
+**Hombre 2:** Y nos vamos a basar en la plataforma.
+
+**Hombre 1:** El 16 de septiembre, ¿inicia esto ya con los platos predefinidos o es solamente que va a empezar la votación?
+
+**Mujer 1:** No, los platos ya predefinidos.
+
+**Hombre 2:** Se va a lanzar todo el concurso el 16.
+
+**Mujer 1:** El 16 ya se va a lanzar.
+
+**Hombre 1:** O sea, ¿ya están los platos candidatos, todos?
+
+**Mujer 1:** Sí, para el lanzamiento.
+
+**Hombre 1:** ¿Pero quiénes son los que van a...? O sea, ¿es solamente por los platos, no es por quién los vaya a preparar?
+
+**Mujer 1:** No, no.
+
+**Hombre 1:** ¡Ah, ya! Solamente por los platos.
+
+**Hombre 2:** Es para ver el plato típico.
+
+**Mujer 1:** Esta ahorita es la primera etapa, digamos, del plato. Gana un plato y después estamos planeando hacer un concurso...
+
+**Hombre 2:** ¿Quién prepara ese plato más rico?
+
+**Mujer 1:** Más grande, exacto. Eso va a ser una segunda etapa, pero primero estamos viendo...
+
+**Mujer 2:** Vamos a convocar a las caseritas.
+
+**Hombre 2:** Yo digo, sería bonito: pónganse que gane el fiambre, al final, ¿por qué no podemos hacer una feria del fiambre con el plato ganador?
+
+**Hombre 1:** Claro, con los que vayan a cocinar.
+
+**Mujer 1:** Es que eso vamos a hacer: vamos a dar el plato ganador y después vamos a hacer un concurso del plato ganador.
+
+**Hombre 1:** Y las personas que quieran cocinar se presentan al concurso y todos van a probar los platos. ¿Y de igual manera va a ser por votación por redes sociales o...?
+
+**Mujer 1:** No, ahí ya va a haber un chef que va a probar.
+
+**Mujer 2:** Un jurado, sí, y las caseritas.
+
+**Hombre 2:** Ajá.
+
+**Mujer 1:** Pero nuestro trabajo básicamente va a ser promocionar este concurso.
+
+**Mujer 2:** Exacto, porque queremos saber cuál es el plato representativo de El Alto.
+
+**Hombre 2:** Ese es el objetivo.
+
+**Mujer 2:** Y hemos elegido cinco platos que generalmente consume la población alteña, que serían: pesk'e, fiambre, apthapi, wallake y ají de fideo.
+
+**Hombre 2:** ¿Y aquí por qué no está la sopita de fideo?
+
+**Mujer 2:** ¿Está?
+
+**Hombre 2:** No, eso es seco, no es...
+
+**Mujer 2:** Yo quería poner sopa de fideo.
+
+**Hombre 2:** Pero hay que diferenciar, ¿no ve? El ají de fideo es tradicional, es de la mamá, con su ahogado, con su chinche bien rico, con su pastita más, ¿no ve? Pero la nueva generación tiene la sopa de fideo con silpancho, ¿no ve? Tenemos que entender eso.
+
+**Mujer 1:** El porqué no la habíamos puesto es porque lo vemos más de colegio, en ese aspecto.
+
+**Hombre 1:** No es poblacional.
+
+**Mujer 1:** No es poblacional, exacto.
+
+**Mujer 2:** De hecho, yo también quería ponerle eso.
+
+**Hombre 2:** ¿Por qué creen que comemos aquí sopas? No es de colegios. Bueno, es mi opinión.
+
+**Mujer 1:** Claro, pero a lo que habíamos...
+
+**Hombre 2:** En la universidad se come. En todo lugar se comen sopas con maní. Yo sugiero eso, chicas: deberían colocar...
+
+**Hombre 1:** ¿En vez de cuál?
+
+**Hombre 2:** No, auméntenlo uno más.
+
+**Mujer 2:** Serían seis.
+
+**Mujer 1:** Con el de Turismo más hay que hablar. [Risas]
+
+**Hombre 2:** Consulten, pero yo les digo porque ese platito lo encontramos en todos lados, no solamente en estudiantes. Ana ha sido testigo, evidentemente todos hemos comido así.
+
+**Mujer 2:** Es de fácil acceso, es económico...
+
+**Hombre 2:** Ajá, comemos en la universidad, incluso aquí: salimos del GAMEA y en la esquina estamos comiendo con su chinche.
+
+**Hombre 1:** Yo creo que tal vez es porque es un plato de la calle, porque no lo vemos dentro de...
+
+**Hombre 2:** Es de pensión.
+
+**Hombre 1:** Hasta incluso en el mercado... ¿has ido al riel de la calle 2, donde venden wallake bien riquito? Y ahí no he visto sopa de fideo.
+
+**Mujer 1:** En tema de turismo también hay que ver. Creo que por esa parte se han guiado.
+
+**Hombre 2:** Es que la idea ahorita es ver la percepción del pueblo. No vamos a ver estratos sociales; lo que queremos es llegar a toda la población, a diferentes estratos sociales, y ellos van a identificarse con un plato. Yo pienso que es eso. No sé con cuál se identifican.
+
+**Hombre 1:** O tal vez dale dos categorías, ¿no?
+
+**Hombre 2:** No le compliques, te vas a complicar mucho. Lo haremos más práctico.
+
+**Mujer 1:** Más que a nosotros, a ustedes en la plataforma. [Risas]
+
+**Hombre 2:** Sí, porque al final puedes generar: «Elijan de estos seis cuál les gusta». El ganador ha sido este, y ya está. Hay que ser lo más práctico, hermano. Nada de categorías.
+
+**Mujer 2:** Que consulten a ver si se puede adicionar, pues.
+
+**Hombre 2:** Vieron, siempre es bueno meter una sugerencia.
+
+**Mujer 1:** Sí, hablaremos con el de Turismo más y después ya decidimos. Y si se da el visto bueno...
+
+**Hombre 2:** Van a decir: «¿Y dónde está la sopa de fideo?», ¿no ve? ¿Se ubican? A eso voy, para que no digan por qué no han metido la sopita.
+
+**Mujer 2:** ¿Quién no ha probado, por lo menos una vez?
+
+**Mujer 1:** ¿Quién no ha comido?
+
+**Hombre 2:** Y básicamente ya se ha vuelto como la sajra hora. De aquí, por ejemplo, se van muchos a comer en la mañana.
+
+**Mujer 1:** Sí, delicioso es, pero lo conversaremos.
+
+**Hombre 2:** Perdón, perdón.
+
+**Mujer 2:** Es económico, es accesible...
+
+*(Pausa en la conversación; revisión de documentos en la computadora)*
+
+**Mujer 1:** Segunda versión del plato bandera...
+
+**Mujer 2:** El plato metrópoli...
+
+**Hombre 1:** De la ciudad metrópoli.
+
+**Mujer 2:** Primera versión del plato de la ciudad metrópoli...
+
+**Hombre 2:** Entonces, inge, ¿cuál va a ser el nombre?
+
+**Hombre 1:** Yo puedo hacer la plataforma. Voy a pedir a los de Sistemas que me creen un subdominio. La población se ubica más solo por los nombres. En vez de que sea platosmetropoli.elalto.gob.bo, es más fácil de recordar que decir [facebook.com/platosmetropoli/](https://www.google.com/search?q=https%3A%2F%2Ffacebook.com%2Fplatosmetropoli%2F)...
+
+**Hombre 2:** ¿Y el QR?
+
+**Hombre 1:** Es que también eso va a posicionar el dominio del GAMEA, ¿no ve? El dominio siempre tiene que preceder a todas las actividades de la entidad. Si vamos a sacar [facebook.com/](https://www.google.com/search?q=https%3A%2F%2Ffacebook.com%2F)... no se identifica con la institución. Todas las promociones tienen que ser dentro del dominio. Fuera de viralizar, hay que ver siempre la parte de utilizar las herramientas de redes sociales que son de paga. No son de mucho costo; yo pago para todos mis proyectos y gasto un dólar diario. Bueno, con la desgracia de que ahora ha subido el dólar: antes salía a 7 bolivianos, ahora sale a 11 o 12 bolivianos por día, pero aun así es redituable. En el caso de ustedes va a ser una campaña de visibilidad porque tenemos que hacer conocer a la gente las cosas que se están haciendo. Y eso también es muy importante para una política pública, para que la sociedad vea todo lo que se está haciendo. En un mes les aseguro que no van a llegar ni a la cuarta parte de la población alteña solo de forma orgánica. Está bien que a los compañeros de todo el GAMEA les digamos que voten, pero ellos van a votar por cumplir. ¿Y la población?
+
+**Hombre 2:** Hay que ver su presupuesto, hermano.
+
+**Hombre 1:** Hasta TikTok ya está entrando.
+
+**Hombre 2:** Ahora, de los materiales me tienen que mandar aquí: de producción y después un *flyer*. Hay que hacerlo bien práctico.
+
+**Hombre 1:** Sí, hay que hacer la hoja de ruta. De una vez todo hay que cerrar hoy día, es un mes nomás que les queda porque hay que hacer aprobar.
+
+*(Pausa en la sala; entra otra persona)*
+
+**Hombre 2:** ¿Ven? Ya estimamos.
+
+**Hombre 3:** Buen día.
+
+**Voces:** Buen día.
+
+**Hombre 2:** Vamos a lanzar esto: votación del plato típico...
+
+**Mujer 2:** El plato metrópoli.
+
+**Hombre 2:** Va a ser un concurso. Vamos a poner una plataforma para la votación, similar a la que tenían, y afiches también, *spots*, ¿no ve?
+
+**Mujer 1:** Sí.
+
+**Hombre 2:** ¿Y a quién se le entrega el *spot* de producción?
+
+**Hombre 1:** Lo más pronto que se pueda.
+
+**Mujer 2:** Y para sacar este *spot*, ¿tendríamos que hacerlo antes de la presentación o después?
+
+**Hombre 2:** Ya tiene que estar listo el *spot*. Ya nomás trabajen en eso.
+
+**Hombre 2:** Para TikTok tal vez con croma podemos hacer, en formato vertical; y el *spot* horizontal para otras difusiones.
+
+**Hombre 2:** ¿Esto va a ser el 16, no ve?
+
+**Mujer 1:** Sí, 16.
+
+**Hombre 2:** ¿Hasta qué fecha va a ser?
+
+**Mujer 1:** Es un mes: 16 de octubre.
+
+**Hombre 2:** El 16 de octubre va a ser el plato ganador. Ese día ya tendría que haber un premio.
+
+**Mujer 1:** En realidad no podemos premiar todavía; vamos a dar a conocer el plato ganador y después vamos a hacer un concurso con la mejor presentación, una lucha de caseras. Digamos que gana el pesk'e: vamos a convocar a todas las caseras pesqueras para que concursen.
+
+**Mujer 2:** O un concurso de sopa de fideo. [Risas]
+
+**Hombre 2:** Pero sería bueno un concurso alrededor del plato ganador, ¿no ve? Y así que vengan todas las que cocinan rico. Eso ya le daría continuidad. Concurso de caseras, ¡bonito ese nombre!
+
+**Mujer 1:** La sopita sí la vamos a considerar.
+
+**Hombre 2:** Ya ven, les he dicho. Y les van a decir: «¿Por qué no está la sopa?».
+
+**Mujer 1:** Con tal de que no sea comida chatarra...
+
+**Mujer 2:** [Risas] Versión comida chatarra.
+
+**Hombre 2:** Ya, entonces, una vez que... Inge, lo tienes eso, ¿no ve?, la plataforma. Tú verás el dominio y todo eso.
+
+**Hombre 1:** Me tienen que confirmar con qué nombre más o menos quieren que vaya el subdominio.
+
+**Mujer 1:** Hasta la tarde lo podemos tener.
+
+**Mujer 2:** Primera versión del Plato Metrópoli de la ciudad...
+
+**Hombre 1:** Algo corto. Por ejemplo: platosmetropoli.elalto.gob.bo.
+
+**Mujer 1:** Sí, me parece.
+
+**Mujer 2:** ¿Plato o platos?
+
+**Hombre 1:** ¿Platos metrópoli?
+
+**Mujer 1:** El plato metrópoli.
+
+**Hombre 1:** elplatometropoli.elalto.gob.bo. Consulten eso, traten de confirmarlo y yo en este momento voy a hablar con Sistemas para que me generen ese subdominio. ¿Tu número cuál es?
+
+**Mujer 1:** 715 23 780.
+
+**Mujer 2:** ¿Cuándo lo podemos filmar el *spot*, hoy o mañana?
+
+**Hombre 1:** Si es con croma, de una vez. Yo estoy al frente, me llaman nomás y coordinan.
+
+**Mujer 2:** ¿Cuál es tu número?
+
+**Hombre 1:** 651...
+
+**Hombre 2:** Para que le vayas enviando la información.
+
+**Mujer 1:** Hoy o mañana lo filmaremos.
+
+**Hombre 1:** Tiene que ser hoy día, porque en la plataforma voy a tardar en hacer. Tenemos 16 días y quiero acabar.
+
+**Mujer 1:** Ya, hoy día hasta más tarde.
+
+**Voces:** Listo, gracias, chao...
+
+*(Se retiran las encargadas; quedan los dos técnicos conversando)*
+
+**Hombre 2:** Me gusta, che. Está muy interesante.
+
+**Hombre 1:** Sí, esto va a salir bien bonito.
+
+**Hombre 2:** A ver que vean su presupuesto. Si va a haber presupuesto, les puedes sugerir, porque tal vez ellos piensan que es costoso.
+
+**Hombre 1:** El director es quien tiene que dar.
+
+**Hombre 2:** Yo te sugiero darles un monto como sugerencia. ¿Cuánto crees de presupuesto?
+
+**Hombre 1:** Para 30 días, por lo menos unos 300 a 350 bolivianos.
+
+**Hombre 2:** ¿Qué es eso? Ellos piensan que debe ser mucho dinero. Está bien 300.
+
+**Hombre 1:** Es lo mismo que el cuate que nos ha hablado de la terminal, que nos dice que el apthapi saca 5.000 o 6.000 bolivianos. ¿De dónde va a sacar 5.000 o 6.000 bolivianos? No cuesta eso. Cuando hablan sin fundamento, eso es lo que da más coraje.
+
+**Hombre 2:** Como vas a estar en contacto con ellos, diles: «Yo le sugiero simplemente unos 200 bolivianos». Que no piensen que debe ser 1.000 para reforzar la difusión.
+
+**Hombre 1:** La difusión está buenísima porque con eso vamos a alcanzar a todo El Alto.
+
+**Hombre 2:** Plantéales eso, hermano. Está bonito el proyecto, me gusta.
+
+**Hombre 1:** Sí, me gusta igual a mí.
