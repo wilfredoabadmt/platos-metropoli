@@ -12,7 +12,7 @@ const dishes = [
         name: 'Ají de Fideo con Chuño',
         description: 'Delicioso fideo tostado bañado en ají colorado, acompañado de chuño y carne.',
         image: 'assets/aji-fideo.jpg',
-        votes: 90
+        votes: 9
     },
     {
         id: 'apthapi',
@@ -26,21 +26,21 @@ const dishes = [
         name: 'Wallake',
         description: 'Caldo de pescado karachi con ají amarillo, papa, chuño y muña.',
         image: 'assets/wallake.jpg',
-        votes: 80
+        votes: 8
     },
     {
         id: 'pesque',
         name: 'Pesque de Quinua',
         description: 'Nutritivo puré de quinua real preparado con leche y abundante queso.',
         image: 'assets/pesque.jpg',
-        votes: 70
+        votes: 7
     },
     {
         id: 'sopa-fideo',
         name: 'Sopita de Fideo',
         description: 'Clásica y reconfortante sopa con carne, verduras y fideo tostado. La "sajra hora".',
         image: 'assets/sopa-fideo.jpg',
-        votes: 90
+        votes: 9
     }
 ];
 
