@@ -384,6 +384,200 @@ body {
     font-family: var(--font-heading);
 }
 
+/* ==========================================================================
+   Countdown & Persuasive Hero Section
+   ========================================================================== */
+.countdown-section {
+    margin-bottom: 48px;
+}
+
+.countdown-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(244, 63, 94, 0.25);
+    border-radius: var(--radius-lg);
+    padding: 40px 32px;
+    text-align: center;
+    box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5), 0 0 35px rgba(244, 63, 94, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+.countdown-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(244, 63, 94, 0.6), rgba(251, 191, 36, 0.6), transparent);
+}
+
+.countdown-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(244, 63, 94, 0.15);
+    border: 1px solid rgba(244, 63, 94, 0.35);
+    color: #fb7185;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 15px rgba(244, 63, 94, 0.2);
+}
+
+.pulsing-clock {
+    display: inline-block;
+    animation: pulse-scale 1.8s infinite ease-in-out;
+}
+
+@keyframes pulse-scale {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+}
+
+.countdown-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.9rem, 3.8vw, 2.7rem);
+    font-weight: 800;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #ffffff 20%, #f43f5e 70%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+}
+
+.countdown-persuasive {
+    max-width: 820px;
+    margin: 0 auto 18px;
+    font-size: 1.08rem;
+    line-height: 1.7;
+    color: #cbd5e1;
+}
+
+.countdown-persuasive strong {
+    color: #f8fafc;
+}
+
+.countdown-persuasive em {
+    color: #f43f5e;
+    font-style: normal;
+    font-weight: 700;
+}
+
+.countdown-info-box {
+    max-width: 820px;
+    margin: 0 auto 28px;
+    padding: 14px 22px;
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px dashed rgba(251, 191, 36, 0.4);
+    border-radius: var(--radius-sm);
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.countdown-info-box strong {
+    color: #fbbf24;
+}
+
+/* Timer Grid */
+.timer-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.timer-box {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    border-radius: var(--radius-md);
+    min-width: 95px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.timer-box:hover {
+    transform: translateY(-2px);
+    border-color: rgba(244, 63, 94, 0.4);
+}
+
+.timer-num {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 4.5vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1;
+    color: #f8fafc;
+    font-variant-numeric: tabular-nums;
+}
+
+.highlight-sec {
+    border-color: rgba(244, 63, 94, 0.4);
+}
+
+.highlight-sec .timer-num {
+    color: #f43f5e;
+    text-shadow: 0 0 20px rgba(244, 63, 94, 0.5);
+}
+
+.timer-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.timer-divider {
+    font-size: 2rem;
+    font-weight: 800;
+    color: rgba(244, 63, 94, 0.6);
+    margin-bottom: 22px;
+    user-select: none;
+}
+
+/* Countdown CTA Button */
+.countdown-cta {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-countdown-vote {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 34px;
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    color: #ffffff;
+    text-decoration: none;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-radius: 999px;
+    box-shadow: 0 6px 25px rgba(244, 63, 94, 0.45);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-countdown-vote:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(244, 63, 94, 0.65);
+}
+
 /* Footer */
 .app-footer {
     border-top: 1px solid var(--glass-border);
@@ -396,6 +590,24 @@ body {
 @media (max-width: 768px) {
     .main-title {
         font-size: 2.5rem;
+    }
+
+    .countdown-card {
+        padding: 28px 18px;
+    }
+
+    .timer-grid {
+        gap: 6px;
+    }
+
+    .timer-box {
+        min-width: 68px;
+        padding: 10px 8px;
+    }
+
+    .timer-divider {
+        font-size: 1.4rem;
+        margin-bottom: 18px;
     }
     
     .results-section {
@@ -418,5 +630,29 @@ body {
     
     .rank-votes {
         align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .timer-box {
+        min-width: 58px;
+        padding: 8px 6px;
+    }
+    .timer-num {
+        font-size: 1.5rem;
+    }
+    .timer-label {
+        font-size: 0.62rem;
+        letter-spacing: 0.8px;
+    }
+    .timer-divider {
+        font-size: 1.1rem;
+        margin-bottom: 14px;
+    }
+    .btn-countdown-vote {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 0.95rem;
     }
 }

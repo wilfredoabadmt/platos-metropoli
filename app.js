@@ -50,8 +50,60 @@ const ranking = document.getElementById('ranking-container');
 
 // Inicialización
 function init() {
+    initCountdown();
     renderDishes();
     renderRanking();
+}
+
+// Cuenta regresiva al 15 de octubre (Cierre de votación)
+function initCountdown() {
+    const currentYear = new Date().getFullYear();
+    // 15 de octubre a las 23:59:59 (mes 9 en JavaScript Date es Octubre)
+    let target = new Date(currentYear, 9, 15, 23, 59, 59).getTime();
+
+    if (Date.now() > target) {
+        target = new Date(currentYear + 1, 9, 15, 23, 59, 59).getTime();
+    }
+
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+
+    if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+
+    function updateTimer() {
+        const now = Date.now();
+        const diff = target - now;
+
+        if (diff <= 0) {
+            daysEl.textContent = '00';
+            hoursEl.textContent = '00';
+            minutesEl.textContent = '00';
+            secondsEl.textContent = '00';
+            const badge = document.querySelector('.countdown-badge');
+            if (badge) {
+                badge.innerHTML = '🏁 ¡VOTACIÓN FINALIZADA!';
+                badge.style.background = 'rgba(16, 185, 129, 0.2)';
+                badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                badge.style.color = '#34d399';
+            }
+            return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        daysEl.textContent = String(days).padStart(2, '0');
+        hoursEl.textContent = String(hours).padStart(2, '0');
+        minutesEl.textContent = String(minutes).padStart(2, '0');
+        secondsEl.textContent = String(seconds).padStart(2, '0');
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
 }
 
 // Renderizar tarjetas de platos
