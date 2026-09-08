@@ -5,42 +5,42 @@ const dishes = [
         name: 'Fiambre',
         description: 'Tradicional plato paceño y alteño, con asado, salchicha, queso frito, huevo, fideo y papa.',
         image: 'assets/fiambre.jpg',
-        votes: 1245
+        votes: 10
     },
     {
         id: 'aji-fideo',
         name: 'Ají de Fideo con Chuño',
         description: 'Delicioso fideo tostado bañado en ají colorado, acompañado de chuño y carne.',
         image: 'assets/aji-fideo.jpg',
-        votes: 980
+        votes: 90
     },
     {
         id: 'apthapi',
         name: 'Apthapi Andino',
         description: 'Comida comunitaria ancestral con papa, chuño, habas, queso, huevo y carnes variadas.',
         image: 'assets/apthapi.jpg',
-        votes: 1102
+        votes: 10
     },
     {
         id: 'wallake',
         name: 'Wallake',
         description: 'Caldo de pescado karachi con ají amarillo, papa, chuño y muña.',
         image: 'assets/wallake.jpg',
-        votes: 856
+        votes: 80
     },
     {
         id: 'pesque',
         name: 'Pesque de Quinua',
         description: 'Nutritivo puré de quinua real preparado con leche y abundante queso.',
         image: 'assets/pesque.jpg',
-        votes: 790
+        votes: 70
     },
     {
         id: 'sopa-fideo',
         name: 'Sopita de Fideo',
         description: 'Clásica y reconfortante sopa con carne, verduras y fideo tostado. La "sajra hora".',
         image: 'assets/sopa-fideo.jpg',
-        votes: 920
+        votes: 90
     }
 ];
 
@@ -137,7 +137,7 @@ function renderDishes() {
 // Renderizar ranking
 function renderRanking() {
     ranking.innerHTML = '';
-    
+
     // Ordenar de mayor a menor
     const sortedDishes = [...dishes].sort((a, b) => b.votes - a.votes);
     const maxVotes = sortedDishes[0]?.votes || 1; // Prevenir división por 0
@@ -145,10 +145,10 @@ function renderRanking() {
     sortedDishes.forEach((dish, index) => {
         const item = document.createElement('div');
         item.className = 'ranking-item';
-        
+
         const isFirst = index === 0;
         const widthPercentage = (dish.votes / maxVotes) * 100;
-        
+
         item.innerHTML = `
             <div class="rank-name">${dish.name}</div>
             <div class="rank-bar-container">
@@ -172,7 +172,7 @@ function vote(dishId, event) {
     const countEl = document.getElementById(`count-${dishId}`);
     if (countEl) {
         countEl.textContent = dish.votes;
-        
+
         // Animación de +1
         const changeEl = document.getElementById(`change-${dishId}`);
         if (changeEl) {
