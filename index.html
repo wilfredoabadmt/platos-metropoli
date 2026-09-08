@@ -40,54 +40,6 @@
     </header>
 
     <main class="container">
-        <!-- Sección de Cuenta Regresiva y Persuasión -->
-        <section class="countdown-section">
-            <div class="countdown-card">
-                <div class="countdown-badge">
-                    <span class="pulsing-clock">⏳</span> CIERRE DE VOTACIÓN: 15 DE OCTUBRE
-                </div>
-                <h2 class="countdown-title">¡El Sabor de El Alto en Tus Manos!</h2>
-                <p class="countdown-persuasive">
-                    Nuestra historia, cultura y orgullo alteño se cocinan a fuego vivo.
-                    <strong>Tu voto es decisivo</strong> para elegir el <em>Plato Bandera</em> que representará a toda
-                    nuestra metrópoli alteña ante Bolivia y el mundo.
-                </p>
-                <div class="countdown-info-box">
-                    <p>
-                        📍 <strong>Gran Revelación del Plato Ganador:</strong> 16 de octubre en predios de <strong>CAFÉ
-                            URVAS</strong> (Museo Antonio Paredes Candía).
-                        ¡Garantiza la voz de tu paladar antes de que el reloj llegue a cero!
-                    </p>
-                </div>
-                <div class="timer-grid" id="countdown-timer">
-                    <div class="timer-box">
-                        <span class="timer-num" id="days">00</span>
-                        <span class="timer-label">Días</span>
-                    </div>
-                    <div class="timer-divider">:</div>
-                    <div class="timer-box">
-                        <span class="timer-num" id="hours">00</span>
-                        <span class="timer-label">Horas</span>
-                    </div>
-                    <div class="timer-divider">:</div>
-                    <div class="timer-box">
-                        <span class="timer-num" id="minutes">00</span>
-                        <span class="timer-label">Minutos</span>
-                    </div>
-                    <div class="timer-divider">:</div>
-                    <div class="timer-box highlight-sec">
-                        <span class="timer-num" id="seconds">00</span>
-                        <span class="timer-label">Segundos</span>
-                    </div>
-                </div>
-                <div class="countdown-cta">
-                    <a href="#dishes-grid" class="btn-countdown-vote">
-                        <span>🗳️ ¡Vota por tu plato favorito ahora!</span>
-                    </a>
-                </div>
-            </div>
-        </section>
-
         <section class="voting-section">
             <header class="section-header">
                 <h2>Elige tu plato favorito</h2>
@@ -113,6 +65,48 @@
             <p>&copy; 2026 Gobierno Autónomo Municipal de El Alto</p>
         </div>
     </footer>
+
+    <!-- Sticky Countdown Bar en el Footer -->
+    <aside class="sticky-countdown-bar" id="sticky-countdown" aria-label="Cuenta regresiva de votación">
+        <div class="container sticky-container">
+            <div class="sticky-info">
+                <div class="sticky-badge">
+                    <span class="pulsing-clock">⏳</span> <strong>Cierre: 15 de Octubre</strong>
+                </div>
+                <p class="sticky-text">
+                    ¡Tu voto elige el Plato Bandera! Ganador el 16 de Octubre en <strong>CAFÉ URVAS</strong>
+                </p>
+            </div>
+
+            <div class="sticky-timer-wrapper">
+                <div class="sticky-timer" id="countdown-timer">
+                    <div class="timer-pill">
+                        <span class="timer-num" id="days">00</span>
+                        <span class="timer-unit">D</span>
+                    </div>
+                    <span class="timer-sep">:</span>
+                    <div class="timer-pill">
+                        <span class="timer-num" id="hours">00</span>
+                        <span class="timer-unit">H</span>
+                    </div>
+                    <span class="timer-sep">:</span>
+                    <div class="timer-pill">
+                        <span class="timer-num" id="minutes">00</span>
+                        <span class="timer-unit">M</span>
+                    </div>
+                    <span class="timer-sep">:</span>
+                    <div class="timer-pill highlight-sec">
+                        <span class="timer-num" id="seconds">00</span>
+                        <span class="timer-unit">S</span>
+                    </div>
+                </div>
+
+                <a href="#dishes-grid" class="btn-sticky-vote">
+                    <span>🗳️ Votar</span>
+                </a>
+            </div>
+        </div>
+    </aside>
 
     <!-- Custom Logic -->
     <script src="app.js"></script>

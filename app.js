@@ -81,7 +81,7 @@ function initCountdown() {
             hoursEl.textContent = '00';
             minutesEl.textContent = '00';
             secondsEl.textContent = '00';
-            const badge = document.querySelector('.countdown-badge');
+            const badge = document.querySelector('.sticky-badge') || document.querySelector('.countdown-badge');
             if (badge) {
                 badge.innerHTML = '🏁 ¡VOTACIÓN FINALIZADA!';
                 badge.style.background = 'rgba(16, 185, 129, 0.2)';
