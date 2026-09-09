@@ -83,7 +83,7 @@ function initCountdown() {
             secondsEl.textContent = '00';
             const badge = document.querySelector('.sticky-badge') || document.querySelector('.countdown-badge');
             if (badge) {
-                badge.innerHTML = '🏁 ¡VOTACIÓN FINALIZADA!';
+                badge.innerHTML = '🏁 ¡ELECCIÓN FINALIZADA!';
                 badge.style.background = 'rgba(16, 185, 129, 0.2)';
                 badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
                 badge.style.color = '#34d399';
@@ -120,7 +120,7 @@ function renderDishes() {
                 <h3 class="dish-title">${dish.name}</h3>
                 <p class="dish-desc">${dish.description}</p>
                 <div class="dish-actions">
-                    <button class="btn-vote" onclick="vote('${dish.id}', event)">Votar</button>
+                    <button class="btn-vote" onclick="vote('${dish.id}', event)">👍 Me Gusta</button>
                     <div class="vote-count-container">
                         <div class="vote-count" id="count-${dish.id}">
                             ${dish.votes}
