@@ -84,9 +84,7 @@ function initCountdown() {
             const badge = document.querySelector('.sticky-badge') || document.querySelector('.countdown-badge');
             if (badge) {
                 badge.innerHTML = '🏁 ¡ELECCIÓN FINALIZADA!';
-                badge.style.background = 'rgba(16, 185, 129, 0.2)';
-                badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-                badge.style.color = '#34d399';
+                badge.classList.add('badge-completed');
             }
             return;
         }
@@ -134,27 +132,44 @@ function renderDishes() {
     });
 }
 
-// Renderizar ranking
+// Renderizar ranking con podio y colores institucionales GAMEA
 function renderRanking() {
     ranking.innerHTML = '';
 
-    // Ordenar de mayor a menor
+    // Ordenar de mayor a menor votos
     const sortedDishes = [...dishes].sort((a, b) => b.votes - a.votes);
     const maxVotes = sortedDishes[0]?.votes || 1; // Prevenir división por 0
 
+    // Metadatos de posiciones y podio GAMEA
+    const podiumConfig = [
+        { classSuffix: '1', medal: '🥇', label: '1° Lugar' },
+        { classSuffix: '2', medal: '🥈', label: '2° Lugar' },
+        { classSuffix: '3', medal: '🥉', label: '3° Lugar' }
+    ];
+
     sortedDishes.forEach((dish, index) => {
         const item = document.createElement('div');
-        item.className = 'ranking-item';
+        const posNumber = index + 1;
+        const config = podiumConfig[index] || { classSuffix: 'other', medal: `${posNumber}°`, label: `${posNumber}° Lugar` };
 
-        const isFirst = index === 0;
-        const widthPercentage = (dish.votes / maxVotes) * 100;
+        item.className = `ranking-item rank-pos-${config.classSuffix}`;
+
+        const widthPercentage = Math.max(8, (dish.votes / maxVotes) * 100);
 
         item.innerHTML = `
-            <div class="rank-name">${dish.name}</div>
-            <div class="rank-bar-container">
-                <div class="rank-bar ${isFirst ? 'first-place' : ''}" style="width: ${widthPercentage}%"></div>
+            <div class="rank-badge rank-badge-${config.classSuffix}" title="${config.label}">
+                <span class="rank-medal">${config.medal}</span>
             </div>
-            <div class="rank-votes" id="rank-val-${dish.id}">${dish.votes}</div>
+            <div class="rank-name" title="${dish.name}">
+                <span>${dish.name}</span>
+            </div>
+            <div class="rank-bar-container">
+                <div class="rank-bar bar-${config.classSuffix}" style="width: ${widthPercentage}%"></div>
+            </div>
+            <div class="rank-votes-container">
+                <span class="rank-votes" id="rank-val-${dish.id}">${dish.votes}</span>
+                <span class="rank-votes-label">votos</span>
+            </div>
         `;
         ranking.appendChild(item);
     });
