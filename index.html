@@ -31,44 +31,46 @@
 
     <header class="app-header">
         <div class="container">
-            <div class="hero-showcase">
+            <div class="hero-showcase hero-horizontal">
                 <!-- Luz ambiental de fondo para resaltar el logo -->
                 <div class="hero-ambient-glow" aria-hidden="true"></div>
 
-                <!-- Badge Institucional GAMEA -->
-                <div class="institutional-badge">
-                    <span class="badge-icon">🏛️</span>
-                    <span class="badge-text">GOBIERNO AUTÓNOMO MUNICIPAL DE EL ALTO</span>
-                    <span class="badge-sep">•</span>
-                    <span class="badge-tag">EL ALTO RENACE</span>
+                <!-- Lado Izquierdo: Logotipo Oficial Compacto -->
+                <div class="hero-col-brand">
+                    <div class="hero-logo-wrapper">
+                        <h1 class="sr-only">El Plato Metrópoli - Primera Versión del Plato Bandera de la Ciudad de El Alto</h1>
+                        <div class="hero-logo-halo" aria-hidden="true"></div>
+                        <img src="images/logoplato.webp" alt="El Plato Metrópoli - Elección Oficial GAM El Alto" class="hero-logo-img">
+                    </div>
                 </div>
 
-                <!-- Logotipo Central Principal -->
-                <div class="hero-logo-wrapper">
-                    <h1 class="sr-only">El Plato Metrópoli - Primera Versión del Plato Bandera de la Ciudad de El Alto</h1>
-                    <div class="hero-logo-halo" aria-hidden="true"></div>
-                    <img src="images/logoplato.webp" alt="El Plato Metrópoli - Elección Oficial GAM El Alto" class="hero-logo-img">
-                </div>
+                <!-- Separador vertical sutil en desktop -->
+                <div class="hero-v-separator" aria-hidden="true"></div>
 
-                <!-- Estado de Votación en Vivo -->
-                <div class="live-status" role="status" aria-live="polite">
-                    <span class="pulsing-dot"></span>
-                    <span class="live-status-text">Votación Ciudadana en Vivo</span>
-                </div>
+                <!-- Lado Derecho: Insignias, Título y Llamado a la Acción -->
+                <div class="hero-col-main">
+                    <!-- Fila Superior: Badge Institucional + Estado en Vivo -->
+                    <div class="hero-badges-row">
+                        <div class="institutional-badge">
+                            <span class="badge-icon">🏛️</span>
+                            <span class="badge-text">GOBIERNO AUTÓNOMO MUNICIPAL DE EL ALTO</span>
+                            <span class="badge-sep">•</span>
+                            <span class="badge-tag">EL ALTO RENACE</span>
+                        </div>
 
-                <!-- Divisor decorativo con colores GAMEA -->
-                <div class="hero-divider" aria-hidden="true">
-                    <span class="hero-divider-line"></span>
-                    <span class="hero-divider-diamond">◆</span>
-                    <span class="hero-divider-line"></span>
-                </div>
+                        <div class="live-status" role="status" aria-live="polite">
+                            <span class="pulsing-dot"></span>
+                            <span class="live-status-text">Votación en Vivo</span>
+                        </div>
+                    </div>
 
-                <!-- Encabezado de Votación y Llamado a la Acción -->
-                <div class="hero-cta-header">
-                    <h2 id="voting-heading" class="hero-cta-title">Elige tu plato favorito</h2>
-                    <p class="hero-cta-subtitle">
-                        Haz clic en <span class="vote-action-pill"><span class="vote-action-icon">👍</span> Me Gusta</span> para apoyar a tu plato preferido y definir la identidad gastronómica alteña.
-                    </p>
+                    <!-- Bloque de Texto y Votación -->
+                    <div class="hero-text-block">
+                        <h2 id="voting-heading" class="hero-cta-title">Elige tu plato favorito</h2>
+                        <p class="hero-cta-subtitle">
+                            Haz clic en <span class="vote-action-pill"><span class="vote-action-icon">👍</span> Me Gusta</span> para apoyar a tu plato preferido y definir la identidad gastronómica alteña.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
