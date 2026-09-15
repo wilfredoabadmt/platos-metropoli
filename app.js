@@ -3,7 +3,7 @@ const dishes = [
     {
         id: 'fiambre',
         name: 'Fiambre',
-        description: 'Tradicional plato paceño y alteño, con asado, salchicha, queso frito, huevo, fideo y papa.',
+        description: 'Tradicional plato alteño, con asado, queso frito, huevo duro, fideo y papa.',
         image: 'assets/fiambre.jpg',
         votes: 10
     },
