@@ -64,6 +64,9 @@
                             <span class="pulsing-dot"></span>
                             <span class="live-status-text">Elección en Vivo</span>
                         </div>
+                        <a href="dashboard.html" class="btn-header-dashboard" title="Ver métricas y procedencia de votos">
+                            <span class="dashboard-icon">📊</span> Panel en Vivo
+                        </a>
                     </div>
 
                     <!-- Bloque de Texto y Votación -->
@@ -101,9 +104,48 @@
         </section>
     </main>
 
+    <!-- Modal de Selección de Distrito / Procedencia -->
+    <div id="district-modal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+        <div class="modal-card">
+            <button class="modal-close" id="modal-close-btn" aria-label="Cerrar modal">&times;</button>
+            <div class="modal-header">
+                <div class="modal-badge">
+                    <span>📍</span> REGISTRO CIUDADANO
+                </div>
+                <h3 id="modal-title" class="modal-title">¿Desde dónde apoyas a tu plato?</h3>
+                <p class="modal-subtitle">Tu voto ayuda a conocer la preferencia gastronómica de cada rincón alteño.</p>
+            </div>
+
+            <div class="modal-dish-preview" id="modal-dish-preview">
+                <!-- Previsualización del plato votado -->
+            </div>
+
+            <div class="modal-body">
+                <label for="district-select" class="modal-label">Selecciona tu Distrito o Ciudad:</label>
+                <div class="district-grid" id="district-grid">
+                    <!-- Opciones de distritos generadas dinámicamente -->
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" id="btn-modal-cancel">Cancelar</button>
+                <button type="button" class="btn-modal-confirm" id="btn-modal-confirm">
+                    <span>👍 Confirmar Mi Voto</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor de Alertas Toast -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
     <footer class="app-footer">
         <div class="container">
-
+            <p class="footer-dashboard">
+                <a href="dashboard.html" class="btn-footer-dashboard">
+                    <span>📊</span> Ver Dashboard General y Actividad de Votación
+                </a>
+            </p>
             <p class="footer-entities">Dirección de Comunicación • Unidad de Turismo • Dirección de Culturas</p>
             <p class="footer-copy">&copy; 2026 Gobierno Autónomo Municipal de El Alto</p>
             <p class="footer-domain"><a href="https://www.elalto.gob.bo" target="_blank"

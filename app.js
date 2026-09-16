@@ -1,5 +1,11 @@
-// Datos de los platos
-const dishes = [
+/**
+ * Elección del Plato Metrópoli - El Alto
+ * Gobierno Autónomo Municipal de El Alto (GAMEA)
+ * Lógica principal de votación conectada a Base de Datos en Tiempo Real
+ */
+
+// Lista de respaldo en caso de funcionamiento sin conexión o estático
+const DEFAULT_DISHES = [
     {
         id: 'fiambre',
         name: 'Fiambre',
@@ -44,26 +50,80 @@ const dishes = [
     }
 ];
 
+// Opciones de Distritos de El Alto y procedencia
+const DISTRICT_OPTIONS = [
+    { id: 'D1', label: 'Distrito 1', sub: 'Satélite / Tejada' },
+    { id: 'D2', label: 'Distrito 2', sub: 'Villa Dolores / Bolívar' },
+    { id: 'D3', label: 'Distrito 3', sub: 'Villa Adela / Cosmos 79' },
+    { id: 'D4', label: 'Distrito 4', sub: 'Río Seco / Yunguyo' },
+    { id: 'D5', label: 'Distrito 5', sub: 'Huayna Potosí' },
+    { id: 'D6', label: 'Distrito 6', sub: '16 de Julio / Ballivián' },
+    { id: 'D7', label: 'Distrito 7', sub: 'San Roque' },
+    { id: 'D8', label: 'Distrito 8', sub: 'Senkata / Tarapacá' },
+    { id: 'D9', label: 'Distrito 9', sub: 'Pomamaya' },
+    { id: 'D10', label: 'Distrito 10', sub: 'Amachuma' },
+    { id: 'D11', label: 'Distrito 11', sub: 'San Pedro de Curva' },
+    { id: 'D12', label: 'Distrito 12', sub: 'Alto Chijini' },
+    { id: 'D13', label: 'Distrito 13', sub: 'Charapaqui' },
+    { id: 'D14', label: 'Distrito 14', sub: 'Bautista Saavedra' },
+    { id: 'LPZ', label: 'Ciudad de La Paz', sub: 'Centro / Sur / Laderas' },
+    { id: 'BOL', label: 'Otra Ciudad de Bolivia', sub: 'Cbb / Scz / Oruro / etc.' },
+    { id: 'EXT', label: 'Fuera del País', sub: 'Residentes en el exterior' }
+];
+
+// Estado de la aplicación
+let dishes = [...DEFAULT_DISHES];
+let selectedDishForVote = null;
+let selectedDistrict = localStorage.getItem('gamea_last_district') || 'Distrito 1 (Ciudad Satélite / Tejada)';
+let hasVotedMap = JSON.parse(localStorage.getItem('gamea_voted_dishes') || '{}');
+
 // Elementos del DOM
 const grid = document.getElementById('dishes-grid');
 const ranking = document.getElementById('ranking-container');
+const modalBackdrop = document.getElementById('district-modal');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+const btnModalCancel = document.getElementById('btn-modal-cancel');
+const btnModalConfirm = document.getElementById('btn-modal-confirm');
+const modalDishPreview = document.getElementById('modal-dish-preview');
+const districtGrid = document.getElementById('district-grid');
+const toastContainer = document.getElementById('toast-container');
 
-// Inicialización
-function init() {
+// Inicialización de la aplicación
+async function init() {
     initCountdown();
-    renderDishes();
-    renderRanking();
+    renderDistrictGrid();
+    setupModalEvents();
+
+    // Cargar datos reales desde la base de datos
+    await fetchLiveDishes();
+
+    // Actualización periódica silenciosa (cada 12 segundos) para mantener sincronía multiusuario
+    setInterval(fetchLiveDishes, 12000);
 }
 
-// Cuenta regresiva al 15 de octubre (Cierre de votación)
-function initCountdown() {
-    const currentYear = new Date().getFullYear();
-    // 15 de octubre a las 23:59:59 (mes 9 en JavaScript Date es Octubre)
-    let target = new Date(currentYear, 9, 15, 23, 59, 59).getTime();
-
-    if (Date.now() > target) {
-        target = new Date(currentYear + 1, 9, 15, 23, 59, 59).getTime();
+// Obtener platos y votos reales desde la API
+async function fetchLiveDishes() {
+    try {
+        const response = await fetch('/api/dishes', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Error al conectar con el servidor');
+        const data = await response.json();
+        if (data.success && Array.isArray(data.dishes) && data.dishes.length > 0) {
+            dishes = data.dishes;
+            renderDishes();
+            renderRanking();
+        }
+    } catch (err) {
+        // En caso de que no haya servidor o esté offline, renderiza con datos locales sin romper la app
+        console.warn('Usando almacenamiento local de contingencia:', err.message);
+        renderDishes();
+        renderRanking();
     }
+}
+
+// Cuenta regresiva al 16 de octubre de 2026 (Gran revelación en Café Urvas)
+function initCountdown() {
+    // 16 de octubre a las 10:00:00 (Mes 9 en JS Date es Octubre)
+    const target = new Date(2026, 9, 16, 10, 0, 0).getTime();
 
     const daysEl = document.getElementById('days');
     const hoursEl = document.getElementById('hours');
@@ -106,19 +166,29 @@ function initCountdown() {
 
 // Renderizar tarjetas de platos
 function renderDishes() {
+    if (!grid) return;
     grid.innerHTML = '';
+
     dishes.forEach(dish => {
+        const alreadyVoted = Boolean(hasVotedMap[dish.id]);
         const card = document.createElement('div');
-        card.className = 'dish-card';
+        card.className = `dish-card ${alreadyVoted ? 'card-voted' : ''}`;
+        card.setAttribute('data-dish-id', dish.id);
+
         card.innerHTML = `
             <div class="dish-image-wrapper">
-                <img src="${dish.image}" alt="${dish.name}" class="dish-image">
+                <img src="${dish.image}" alt="${dish.name}" class="dish-image" loading="lazy">
+                ${alreadyVoted ? '<div class="voted-ribbon">✓ Votado</div>' : ''}
             </div>
             <div class="dish-content">
                 <h3 class="dish-title">${dish.name}</h3>
                 <p class="dish-desc">${dish.description}</p>
                 <div class="dish-actions">
-                    <button class="btn-vote" onclick="vote('${dish.id}', event)">👍 Me Gusta</button>
+                    <button class="btn-vote ${alreadyVoted ? 'btn-voted' : ''}" 
+                            id="btn-vote-${dish.id}"
+                            onclick="handleVoteClick('${dish.id}', event)">
+                        <span>${alreadyVoted ? '✓ Apoyado' : '👍 Me Gusta'}</span>
+                    </button>
                     <div class="vote-count-container">
                         <div class="vote-count" id="count-${dish.id}">
                             ${dish.votes}
@@ -132,13 +202,15 @@ function renderDishes() {
     });
 }
 
-// Renderizar ranking con podio y colores institucionales GAMEA
+// Renderizar ranking con podio y colores oficiales GAMEA
 function renderRanking() {
+    if (!ranking) return;
     ranking.innerHTML = '';
 
     // Ordenar de mayor a menor votos
     const sortedDishes = [...dishes].sort((a, b) => b.votes - a.votes);
-    const maxVotes = sortedDishes[0]?.votes || 1; // Prevenir división por 0
+    const maxVotes = Math.max(1, sortedDishes[0]?.votes || 1);
+    const totalVotes = sortedDishes.reduce((acc, d) => acc + d.votes, 0);
 
     // Metadatos de posiciones y podio GAMEA
     const podiumConfig = [
@@ -155,6 +227,7 @@ function renderRanking() {
         item.className = `ranking-item rank-pos-${config.classSuffix}`;
 
         const widthPercentage = Math.max(8, (dish.votes / maxVotes) * 100);
+        const percentOfTotal = totalVotes > 0 ? ((dish.votes / totalVotes) * 100).toFixed(1) : 0;
 
         item.innerHTML = `
             <div class="rank-badge rank-badge-${config.classSuffix}" title="${config.label}">
@@ -167,6 +240,7 @@ function renderRanking() {
                 <div class="rank-bar bar-${config.classSuffix}" style="width: ${widthPercentage}%"></div>
             </div>
             <div class="rank-votes-container">
+                <span class="rank-percentage">${percentOfTotal}%</span>
                 <span class="rank-votes" id="rank-val-${dish.id}">${dish.votes}</span>
                 <span class="rank-votes-label">votos</span>
             </div>
@@ -175,20 +249,179 @@ function renderRanking() {
     });
 }
 
-// Función de votación (Simulación de tiempo real)
-function vote(dishId, event) {
+// Configurar modal de distritos
+function renderDistrictGrid() {
+    if (!districtGrid) return;
+    districtGrid.innerHTML = '';
+
+    DISTRICT_OPTIONS.forEach(opt => {
+        const fullDistrictName = `${opt.label} (${opt.sub})`;
+        const isSelected = selectedDistrict.startsWith(opt.label);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `district-pill ${isSelected ? 'selected' : ''}`;
+        btn.setAttribute('data-full-name', fullDistrictName);
+        btn.innerHTML = `
+            <span class="pill-title">${opt.label}</span>
+            <span class="pill-sub">${opt.sub}</span>
+        `;
+
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.district-pill').forEach(p => p.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedDistrict = fullDistrictName;
+            localStorage.setItem('gamea_last_district', fullDistrictName);
+        });
+
+        districtGrid.appendChild(btn);
+    });
+}
+
+// Eventos de apertura y cierre del modal
+function setupModalEvents() {
+    if (!modalBackdrop) return;
+
+    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+    if (btnModalCancel) btnModalCancel.addEventListener('click', closeModal);
+
+    modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) closeModal();
+    });
+
+    if (btnModalConfirm) {
+        btnModalConfirm.addEventListener('click', submitVote);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalBackdrop.classList.contains('active')) {
+            closeModal();
+        }
+    });
+}
+
+function openDistrictModal(dishId) {
     const dish = dishes.find(d => d.id === dishId);
-    if (!dish) return;
+    if (!dish || !modalBackdrop) return;
 
-    // Incrementar votos
-    dish.votes += 1;
+    selectedDishForVote = dish;
 
-    // Actualizar contador en la tarjeta
+    // Actualizar vista previa en el modal
+    if (modalDishPreview) {
+        modalDishPreview.innerHTML = `
+            <img src="${dish.image}" alt="${dish.name}" class="modal-dish-img">
+            <div class="modal-dish-info">
+                <h4 class="modal-dish-name">${dish.name}</h4>
+                <p class="modal-dish-tag">Plato Candidato Oficial de El Alto</p>
+            </div>
+        `;
+    }
+
+    modalBackdrop.classList.add('active');
+    modalBackdrop.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    if (!modalBackdrop) return;
+    modalBackdrop.classList.remove('active');
+    modalBackdrop.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    selectedDishForVote = null;
+}
+
+// Manejar clic en botón de votar de la tarjeta
+function handleVoteClick(dishId, event) {
+    if (event) {
+        const btn = event.currentTarget;
+        btn.style.transform = 'scale(0.95)';
+        setTimeout(() => { btn.style.transform = ''; }, 150);
+    }
+
+    // Si ya votó por este plato, informar al usuario
+    if (hasVotedMap[dishId]) {
+        showToast(`Ya has emitido tu voto por ${dishes.find(d => d.id === dishId)?.name || 'este plato'}. ¡Gracias por apoyar!`, 'info');
+        return;
+    }
+
+    openDistrictModal(dishId);
+}
+
+// Enviar voto oficial a la Base de Datos
+async function submitVote() {
+    if (!selectedDishForVote) return;
+
+    const dishId = selectedDishForVote.id;
+    const dishName = selectedDishForVote.name;
+    const district = selectedDistrict || 'Distrito 1 (Ciudad Satélite / Tejada)';
+
+    // Bloquear botón durante el envío
+    if (btnModalConfirm) {
+        btnModalConfirm.disabled = true;
+        btnModalConfirm.innerHTML = '<span>⏳ Registrando voto...</span>';
+    }
+
+    try {
+        const response = await fetch('/api/vote', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                dishId,
+                district,
+                city: district.includes('La Paz') ? 'La Paz' : (district.includes('Otra') ? 'Interior' : 'El Alto')
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            // Actualizar votos en memoria local
+            const targetDish = dishes.find(d => d.id === dishId);
+            if (targetDish) {
+                targetDish.votes = data.newVotes;
+            }
+
+            // Marcar plato como votado en localStorage
+            hasVotedMap[dishId] = true;
+            localStorage.setItem('gamea_voted_dishes', JSON.stringify(hasVotedMap));
+
+            // Actualizar tarjeta y contador visual
+            updateCardAfterVote(dishId, data.newVotes);
+            renderRanking();
+
+            closeModal();
+            showToast(`¡Voto registrado con éxito! Apoyaste a "${dishName}" desde ${district.split('(')[0].trim()}.`, 'success');
+        } else {
+            showToast(data.error || 'No se pudo registrar el voto en este momento.', 'error');
+        }
+    } catch (err) {
+        console.error('Error al registrar voto:', err);
+        // Fallback optimista si no hay conexión al backend
+        const targetDish = dishes.find(d => d.id === dishId);
+        if (targetDish) {
+            targetDish.votes += 1;
+            updateCardAfterVote(dishId, targetDish.votes);
+            renderRanking();
+        }
+        hasVotedMap[dishId] = true;
+        localStorage.setItem('gamea_voted_dishes', JSON.stringify(hasVotedMap));
+        closeModal();
+        showToast(`¡Voto anotado con éxito para ${dishName}!`, 'success');
+    } finally {
+        if (btnModalConfirm) {
+            btnModalConfirm.disabled = false;
+            btnModalConfirm.innerHTML = '<span>👍 Confirmar Mi Voto</span>';
+        }
+    }
+}
+
+// Actualizar tarjeta después del voto con animación
+function updateCardAfterVote(dishId, newCount) {
     const countEl = document.getElementById(`count-${dishId}`);
     if (countEl) {
-        countEl.textContent = dish.votes;
-
-        // Animación de +1
+        countEl.textContent = newCount;
         const changeEl = document.getElementById(`change-${dishId}`);
         if (changeEl) {
             changeEl.classList.remove('active');
@@ -197,28 +430,54 @@ function vote(dishId, event) {
         }
     }
 
-    // Efecto ripple en el botón clickeado
-    if (event) {
-        const btn = event.currentTarget;
-        btn.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            btn.style.transform = '';
-        }, 150);
+    const voteBtn = document.getElementById(`btn-vote-${dishId}`);
+    if (voteBtn) {
+        voteBtn.classList.add('btn-voted');
+        voteBtn.innerHTML = '<span>✓ Apoyado</span>';
     }
 
-    // Actualizar ranking
-    renderRanking();
+    const card = document.querySelector(`.dish-card[data-dish-id="${dishId}"]`);
+    if (card) {
+        card.classList.add('card-voted');
+        const imgWrapper = card.querySelector('.dish-image-wrapper');
+        if (imgWrapper && !imgWrapper.querySelector('.voted-ribbon')) {
+            const ribbon = document.createElement('div');
+            ribbon.className = 'voted-ribbon';
+            ribbon.textContent = '✓ Votado';
+            imgWrapper.appendChild(ribbon);
+        }
+    }
 }
 
-// Simular votaciones aleatorias de otros usuarios (Real-time effect)
-setInterval(() => {
-    // 30% de probabilidad de que ocurra un voto aleatorio cada 2 segundos
-    if (Math.random() < 0.3) {
-        const randomIndex = Math.floor(Math.random() * dishes.length);
-        const randomDish = dishes[randomIndex];
-        vote(randomDish.id, null);
-    }
-}, 2000);
+// Notificaciones Toast elegantes
+function showToast(message, type = 'success') {
+    if (!toastContainer) return;
 
-// Iniciar app
+    const toast = document.createElement('div');
+    toast.className = `gamea-toast toast-${type}`;
+
+    const icon = type === 'success' ? '✅' : (type === 'error' ? '⚠️' : 'ℹ️');
+
+    toast.innerHTML = `
+        <span class="toast-icon">${icon}</span>
+        <span class="toast-msg">${message}</span>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    // Animación de entrada
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
+
+    // Desaparecer después de 4.5 segundos
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 300);
+    }, 4500);
+}
+
+// Iniciar app al cargar el DOM
 document.addEventListener('DOMContentLoaded', init);

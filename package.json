@@ -1,0 +1,21 @@
+{
+  "name": "platos-metropoli-elalto",
+  "version": "1.0.0",
+  "description": "Plataforma oficial de votación para la elección del Plato Metrópoli - Primera Versión del Plato Bandera de la Ciudad de El Alto (GAMEA)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "init-db": "node data/init_db.js"
+  },
+  "keywords": [
+    "el-alto",
+    "gamea",
+    "plato-metropoli",
+    "votacion",
+    "cultura",
+    "turismo"
+  ],
+  "author": "Dirección de Comunicación - GAMEA",
+  "license": "ISC"
+}

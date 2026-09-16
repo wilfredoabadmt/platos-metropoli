@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Oficial - Elección del Plato Metrópoli El Alto</title>
+    <meta name="description"
+        content="Panel institucional de seguimiento en tiempo real de la votación del Plato Metrópoli. Monitoreo de actividad, líderes gastronómicos y procedencia distrital en El Alto.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Estilos del Dashboard -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body class="dashboard-body">
+    <!-- Cinta Superior Oficial GAMEA -->
+    <div class="gamea-top-ribbon" aria-hidden="true"></div>
+
+    <!-- Luces ambientales de fondo -->
+    <div class="background-elements" aria-hidden="true">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
+    <!-- Header del Dashboard -->
+    <header class="dash-header">
+        <div class="container dash-header-container">
+            <div class="dash-brand">
+                <a href="/" class="dash-back-link" title="Volver a la página de votación">
+                    <span class="back-arrow">←</span> Volver a Votar
+                </a>
+                <div class="dash-logo-box">
+                    <img src="images/logoplato.webp" alt="El Plato Metrópoli GAMEA" class="dash-logo-img">
+                    <div class="dash-titles">
+                        <div class="dash-badge-inst">
+                            <span>🏛️ GOBIERNO AUTÓNOMO MUNICIPAL DE EL ALTO</span>
+                        </div>
+                        <h1 class="dash-main-title">Panel de Control y Monitoreo Electoral</h1>
+                        <p class="dash-subtitle">Actividad ciudadana, procedencia por distritos y estadísticas oficiales en vivo</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-actions-bar">
+                <div class="live-status pulse-gold" role="status" aria-live="polite">
+                    <span class="pulsing-dot dot-teal"></span>
+                    <span class="live-status-text">Monitoreo en Vivo</span>
+                </div>
+                <div class="dash-buttons-group">
+                    <button id="btn-refresh" class="btn-dash-action" title="Actualizar datos">
+                        <span class="btn-icon" id="refresh-icon">🔄</span> Actualizar
+                    </button>
+                    <a href="/api/export/csv" id="btn-export-csv" class="btn-dash-action btn-dash-export" download title="Descargar reporte en formato Excel/CSV">
+                        <span class="btn-icon">📥</span> Exportar CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal del Dashboard -->
+    <main class="container dash-main">
+
+        <!-- 1. Tarjetas KPI de Resumen Ejecutivo -->
+        <section class="kpi-grid" aria-label="Métricas Principales">
+            <!-- Total de Votos -->
+            <div class="kpi-card card-total">
+                <div class="kpi-icon-wrapper icon-magenta">🗳️</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">VOTOS REGISTRADOS</span>
+                    <h2 class="kpi-value" id="kpi-total-votes">--</h2>
+                    <span class="kpi-subtext" id="kpi-last24h">Cargando actividad...</span>
+                </div>
+            </div>
+
+            <!-- Plato Líder Actual -->
+            <div class="kpi-card card-leader">
+                <div class="kpi-icon-wrapper icon-yellow">🥇</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">PLATO EN 1° LUGAR</span>
+                    <h2 class="kpi-value" id="kpi-leader-name">--</h2>
+                    <span class="kpi-subtext highlight-yellow" id="kpi-leader-stat">-- votos</span>
+                </div>
+            </div>
+
+            <!-- Distrito / Ubicación Líder -->
+            <div class="kpi-card card-district">
+                <div class="kpi-icon-wrapper icon-teal">📍</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">DISTRITO MÁS ACTIVO</span>
+                    <h2 class="kpi-value text-ellipsis" id="kpi-top-district">--</h2>
+                    <span class="kpi-subtext" id="kpi-district-stat">Mayor participación alteña</span>
+                </div>
+            </div>
+
+            <!-- Participación Móvil -->
+            <div class="kpi-card card-mobile">
+                <div class="kpi-icon-wrapper icon-purple">📱</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">TRÁFICO MÓVIL (REDES)</span>
+                    <h2 class="kpi-value" id="kpi-mobile-pct">--%</h2>
+                    <span class="kpi-subtext" id="kpi-mobile-stat">Votantes desde Smartphones</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Gráficos Interactivos de Actividad y Procedencia -->
+        <section class="charts-grid" aria-label="Gráficos de Análisis">
+            <!-- Gráfico 1: Preferencia por Platos -->
+            <div class="chart-card card-half">
+                <div class="chart-header">
+                    <div class="chart-title-box">
+                        <span class="chart-icon">🍲</span>
+                        <div>
+                            <h3 class="chart-title">Distribución de Votos por Plato</h3>
+                            <p class="chart-desc">Porcentaje y total de preferencias ciudadanas</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="chart-dishes"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 2: Actividad en el Tiempo -->
+            <div class="chart-card card-half">
+                <div class="chart-header">
+                    <div class="chart-title-box">
+                        <span class="chart-icon">📈</span>
+                        <div>
+                            <h3 class="chart-title">Línea de Actividad Electoral</h3>
+                            <p class="chart-desc">Evolución de la votación a lo largo del tiempo</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="chart-timeline"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 3: Votos por Distritos de El Alto y Regiones -->
+            <div class="chart-card card-wide">
+                <div class="chart-header">
+                    <div class="chart-title-box">
+                        <span class="chart-icon">🗺️</span>
+                        <div>
+                            <h3 class="chart-title">Participación Geográfica (Distritos de El Alto y Ciudades)</h3>
+                            <p class="chart-desc">Procedencia declarada por los ciudadanos votantes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-body chart-body-tall">
+                    <canvas id="chart-districts"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 4: Dispositivos de Origen -->
+            <div class="chart-card card-compact">
+                <div class="chart-header">
+                    <div class="chart-title-box">
+                        <span class="chart-icon">💻</span>
+                        <div>
+                            <h3 class="chart-title">Plataforma de Votación</h3>
+                            <p class="chart-desc">Móvil vs. Escritorio (Impacto de Redes Sociales)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-body chart-body-compact">
+                    <canvas id="chart-devices"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 5: Actividad por Horas del Día -->
+            <div class="chart-card card-extended">
+                <div class="chart-header">
+                    <div class="chart-title-box">
+                        <span class="chart-icon">⏰</span>
+                        <div>
+                            <h3 class="chart-title">Horas Pico de Votación</h3>
+                            <p class="chart-desc">Distribución horaria (00:00 a 23:00)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="chart-hourly"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Tabla de Registro en Vivo de Últimos Votos -->
+        <section class="live-feed-section" aria-label="Registro de Últimos Votos">
+            <div class="feed-card">
+                <div class="feed-header">
+                    <div class="feed-title-box">
+                        <span class="feed-icon">⚡</span>
+                        <div>
+                            <h3 class="feed-title">Últimos Votos Registrados en Vivo</h3>
+                            <p class="feed-desc">Auditoría y trazabilidad en tiempo real de cada sufragio emitido</p>
+                        </div>
+                    </div>
+                    <div class="feed-counter-badge">
+                        Últimos <span id="feed-count">50</span> votos
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="dash-table" id="table-recent-votes">
+                        <thead>
+                            <tr>
+                                <th># Voto</th>
+                                <th>Fecha y Hora</th>
+                                <th>Plato Elegido</th>
+                                <th>Procedencia / Distrito</th>
+                                <th>Ciudad</th>
+                                <th>Dispositivo</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="votes-tbody">
+                            <tr>
+                                <td colspan="7" class="td-loading">Cargando últimos registros...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Institucional -->
+    <footer class="app-footer dash-footer">
+        <div class="container">
+            <p class="footer-entities">Dirección de Comunicación • Unidad de Turismo • Dirección de Culturas</p>
+            <p class="footer-copy">&copy; 2026 Gobierno Autónomo Municipal de El Alto</p>
+            <p class="footer-domain"><a href="https://www.elalto.gob.bo" target="_blank"
+                    rel="noopener noreferrer">elalto.gob.bo</a></p>
+        </div>
+    </footer>
+
+    <!-- Lógica del Dashboard -->
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

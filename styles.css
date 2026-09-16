@@ -1431,3 +1431,406 @@ body {
         font-size: 0.8rem;
     }
 }
+
+/* ==========================================================================
+   Botones de Acceso al Dashboard Institucional
+   ========================================================================== */
+.btn-header-dashboard {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(16, 146, 139, 0.22);
+    border: 1px solid var(--gamea-teal-light);
+    color: #e6fffa;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 10px rgba(16, 146, 139, 0.25);
+}
+
+.btn-header-dashboard:hover {
+    background: var(--gamea-teal);
+    color: #ffffff;
+    box-shadow: 0 4px 18px var(--gamea-teal-glow);
+    transform: translateY(-1px);
+}
+
+.footer-dashboard {
+    margin-bottom: 1.5rem;
+}
+
+.btn-footer-dashboard {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(70, 47, 140, 0.35), rgba(16, 146, 139, 0.35));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 10px 22px;
+    border-radius: 9999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-footer-dashboard:hover {
+    background: linear-gradient(135deg, var(--gamea-purple), var(--gamea-teal));
+    border-color: var(--gamea-yellow);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(244, 177, 41, 0.3);
+}
+
+/* ==========================================================================
+   Modal de Selección de Distrito / Ubicación
+   ========================================================================== */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(4, 7, 15, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    padding: 1rem;
+}
+
+.modal-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-card {
+    background: linear-gradient(165deg, rgba(20, 29, 52, 0.98), rgba(11, 16, 30, 0.98));
+    border: 1px solid rgba(244, 177, 41, 0.3);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    padding: 2rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(237, 41, 134, 0.2);
+    transform: scale(0.92) translateY(20px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-backdrop.active .modal-card {
+    transform: scale(1) translateY(0);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.6rem;
+    line-height: 1;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: rgba(237, 41, 134, 0.3);
+    color: #ffffff;
+    transform: rotate(90deg);
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.modal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(244, 177, 41, 0.15);
+    border: 1px solid rgba(244, 177, 41, 0.4);
+    color: var(--gamea-yellow);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    margin-bottom: 0.6rem;
+}
+
+.modal-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffffff;
+    font-family: var(--font-heading);
+    margin-bottom: 0.35rem;
+}
+
+.modal-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-subtle);
+    max-width: 440px;
+    margin: 0 auto;
+}
+
+.modal-dish-preview {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.modal-dish-img {
+    width: 62px;
+    height: 62px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    border: 2px solid var(--gamea-yellow);
+}
+
+.modal-dish-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: var(--font-heading);
+}
+
+.modal-dish-tag {
+    font-size: 0.78rem;
+    color: var(--gamea-teal-light);
+}
+
+.modal-label {
+    display: block;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 0.65rem;
+}
+
+.district-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: 1.5rem;
+}
+
+.district-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.district-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+}
+
+.district-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 8px 10px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.district-pill:hover {
+    background: rgba(237, 41, 134, 0.15);
+    border-color: var(--gamea-magenta);
+    transform: translateY(-1px);
+}
+
+.district-pill.selected {
+    background: linear-gradient(135deg, rgba(237, 41, 134, 0.35), rgba(70, 47, 140, 0.45));
+    border-color: var(--gamea-yellow);
+    box-shadow: 0 0 12px rgba(244, 177, 41, 0.35);
+}
+
+.district-pill .pill-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.district-pill.selected .pill-title {
+    color: var(--gamea-yellow);
+}
+
+.district-pill .pill-sub {
+    font-size: 0.68rem;
+    color: var(--text-subtle);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid var(--glass-border);
+    padding-top: 1.25rem;
+}
+
+.btn-modal-cancel {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-muted);
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-modal-cancel:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.btn-modal-confirm {
+    background: linear-gradient(135deg, var(--gamea-magenta) 0%, var(--gamea-magenta-dark) 100%);
+    border: none;
+    color: #ffffff;
+    padding: 11px 26px;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px var(--gamea-magenta-glow);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-modal-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--gamea-magenta-glow);
+}
+
+.btn-modal-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ==========================================================================
+   Estados de Plato Votado
+   ========================================================================== */
+.btn-vote.btn-voted {
+    background: rgba(16, 146, 139, 0.25);
+    border: 1px solid var(--gamea-teal-light);
+    color: #e6fffa;
+    cursor: default;
+    box-shadow: none;
+}
+
+.voted-ribbon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--gamea-teal);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    letter-spacing: 0.5px;
+}
+
+.rank-percentage {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--gamea-yellow);
+    margin-right: 6px;
+}
+
+/* ==========================================================================
+   Notificaciones Toast
+   ========================================================================== */
+.toast-container {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.gamea-toast {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid var(--gamea-teal);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px var(--gamea-teal-glow);
+    backdrop-filter: blur(12px);
+    pointer-events: auto;
+    max-width: 380px;
+    transform: translateY(30px) scale(0.95);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gamea-toast.show {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.gamea-toast.toast-error {
+    border-color: var(--gamea-magenta);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px var(--gamea-magenta-glow);
+}
+
+.gamea-toast.toast-info {
+    border-color: var(--gamea-yellow);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px var(--gamea-yellow-glow);
+}
+
+.toast-icon {
+    font-size: 1.25rem;
+}
+
+.toast-msg {
+    font-size: 0.88rem;
+    line-height: 1.4;
+    color: var(--text-main);
+}
