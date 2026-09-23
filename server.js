@@ -22,19 +22,68 @@ const MIME_TYPES = {
     '.txt': 'text/plain; charset=UTF-8'
 };
 
-// Control anti-spam simple por IP (cooldown de 2 segundos por IP)
+// Control anti-spam y rate-limiting por IP (Ventana deslizante de 60 segundos)
+const ipRequestWindow = new Map();
+const COOLDOWN_MS = 1500;
 const ipCooldownMap = new Map();
-const COOLDOWN_MS = 2000;
 
-function cleanOldCooldowns() {
+function isIpRateLimited(ip) {
     const now = Date.now();
+    const windowStart = now - 60000;
+    let timestamps = ipRequestWindow.get(ip) || [];
+    timestamps = timestamps.filter(t => t > windowStart);
+    if (timestamps.length >= 15) { // Máximo 15 votos por minuto por IP
+        ipRequestWindow.set(ip, timestamps);
+        return true;
+    }
+    timestamps.push(now);
+    ipRequestWindow.set(ip, timestamps);
+    return false;
+}
+
+function cleanOldWindows() {
+    const now = Date.now();
+    const windowStart = now - 60000;
+    for (const [ip, timestamps] of ipRequestWindow.entries()) {
+        const active = timestamps.filter(t => t > windowStart);
+        if (active.length === 0) {
+            ipRequestWindow.delete(ip);
+        } else {
+            ipRequestWindow.set(ip, active);
+        }
+    }
     for (const [ip, timestamp] of ipCooldownMap.entries()) {
-        if (now - timestamp > 60000) {
+        if (now - timestamp > 30000) {
             ipCooldownMap.delete(ip);
         }
     }
 }
-setInterval(cleanOldCooldowns, 30000);
+setInterval(cleanOldWindows, 30000);
+
+// Pool de clientes Server-Sent Events (SSE) para tiempo real
+const sseClients = new Set();
+
+function broadcastSse(eventType, data) {
+    const payload = `event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`;
+    for (const client of sseClients) {
+        try {
+            client.write(payload);
+        } catch {
+            sseClients.delete(client);
+        }
+    }
+}
+
+// Keep-alive heartbeat cada 25 segundos para proxies y CDNs
+setInterval(() => {
+    for (const client of sseClients) {
+        try {
+            client.write(': ping\n\n');
+        } catch {
+            sseClients.delete(client);
+        }
+    }
+}, 25000);
 
 // Helper para parsear cuerpo JSON
 function parseJsonBody(req) {
@@ -59,7 +108,7 @@ function parseJsonBody(req) {
     });
 }
 
-// Helper para responder JSON
+// Helper para responder JSON con cabeceras de seguridad
 function sendJson(res, statusCode, data) {
     const jsonStr = JSON.stringify(data);
     res.writeHead(statusCode, {
@@ -67,7 +116,9 @@ function sendJson(res, statusCode, data) {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Cache-Control': 'no-store, no-cache, must-revalidate'
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'SAMEORIGIN'
     });
     res.end(jsonStr);
 }
@@ -88,8 +139,34 @@ const server = http.createServer(async (req, res) => {
     const pathname = reqUrl.pathname;
 
     // ==========================================
-    // RUTAS DE LA API REST
+    // RUTAS DE LA API REST Y TIEMPO REAL
     // ==========================================
+
+    // 0. Canal en Tiempo Real con Server-Sent Events (SSE)
+    if (req.method === 'GET' && pathname === '/api/stream') {
+        res.writeHead(200, {
+            'Content-Type': 'text/event-stream; charset=UTF-8',
+            'Cache-Control': 'no-cache, no-transform',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
+            'X-Accel-Buffering': 'no'
+        });
+
+        // Enviar estado inicial del ranking al conectar
+        try {
+            const initialSummary = dbService.getRankingSummary();
+            res.write(`event: init\ndata: ${JSON.stringify(initialSummary)}\n\n`);
+        } catch (err) {
+            console.error('Error enviando estado inicial SSE:', err);
+        }
+
+        sseClients.add(res);
+
+        req.on('close', () => {
+            sseClients.delete(res);
+        });
+        return;
+    }
 
     // 1. Obtener platos y sus votos actuales
     if (req.method === 'GET' && pathname === '/api/dishes') {
@@ -108,7 +185,7 @@ const server = http.createServer(async (req, res) => {
                 .split(',')[0].trim();
             const userAgent = req.headers['user-agent'] || '';
 
-            // Verificar cooldown para prevenir flood
+            // Verificar cooldown de ráfaga inmediata
             const lastVote = ipCooldownMap.get(clientIp);
             const now = Date.now();
             if (lastVote && (now - lastVote < COOLDOWN_MS)) {
@@ -118,8 +195,22 @@ const server = http.createServer(async (req, res) => {
                 });
             }
 
+            // Verificar límite de votos por minuto desde la misma red/IP
+            if (isIpRateLimited(clientIp)) {
+                return sendJson(res, 429, {
+                    success: false,
+                    error: 'Has alcanzado el límite de participación momentáneo desde esta conexión. Por favor reintenta en un minuto.'
+                });
+            }
+
             const body = await parseJsonBody(req);
-            const { dishId, district = 'Distrito 1 (Ciudad Satélite)', city = 'El Alto' } = body;
+
+            // Protección Anti-Bot Honeypot (campo oculto que los bots llenan)
+            if (body.hp_field || body.hp_code) {
+                return sendJson(res, 400, { success: false, error: 'Solicitud no permitida.' });
+            }
+
+            const { dishId, district = 'Distrito 1 (Ciudad Satélite / Tejada)', city = 'El Alto', voterUuid = null } = body;
 
             if (!dishId) {
                 return sendJson(res, 400, { success: false, error: 'Se requiere el ID del plato.' });
@@ -144,10 +235,20 @@ const server = http.createServer(async (req, res) => {
                 country: 'Bolivia',
                 deviceType,
                 ip: clientIp,
+                voterUuid,
                 userAgent
             });
 
             ipCooldownMap.set(clientIp, now);
+
+            // Transmisión instantánea SSE a todos los ciudadanos y pantallas activas
+            broadcastSse('vote_update', {
+                dishId: result.dishId,
+                dishName: result.dishName,
+                newVotes: result.newVotes,
+                ranking: result.ranking,
+                timestamp: result.timestamp
+            });
 
             return sendJson(res, 200, result);
         } catch (err) {

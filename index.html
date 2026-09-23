@@ -8,6 +8,15 @@
     <meta name="description"
         content="Participa en la elección del Plato Metrópoli, la primera versión del Plato Bandera de la ciudad de El Alto. ¡Vota por tu plato favorito en tiempo real!">
 
+    <!-- OpenGraph & Social Sharing Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Elección Oficial del Plato Metrópoli - El Alto 2026">
+    <meta property="og:description" content="Participa en la elección oficial del Plato Metrópoli de la ciudad de El Alto. Vota por tu favorito en tiempo real y define la identidad gastronómica alteña.">
+    <meta property="og:image" content="images/logoplato.webp">
+    <meta property="og:locale" content="es_BO">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#ed2986">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,6 +137,8 @@
             </div>
 
             <div class="modal-footer">
+                <!-- Campo Anti-Bot Honeypot invisible para humanos -->
+                <input type="text" name="hp_field" id="hp-field" style="display:none !important;" tabindex="-1" autocomplete="off" aria-hidden="true">
                 <button type="button" class="btn-modal-cancel" id="btn-modal-cancel">Cancelar</button>
                 <button type="button" class="btn-modal-confirm" id="btn-modal-confirm">
                     <span>👍 Confirmar Mi Voto</span>

@@ -10,9 +10,11 @@ if (!fs.existsSync(DATA_DIR)) {
 const DB_PATH = path.join(DATA_DIR, 'votacion.db');
 const db = new DatabaseSync(DB_PATH);
 
-// Habilitar modo WAL y llaves foráneas para máximo rendimiento y consistencia
+// Habilitar modo WAL, busy_timeout y llaves foráneas para máximo rendimiento y consistencia concurrente
 db.exec('PRAGMA journal_mode = WAL;');
 db.exec('PRAGMA foreign_keys = ON;');
+db.exec('PRAGMA busy_timeout = 5000;');
+db.exec('PRAGMA synchronous = NORMAL;');
 
 // Crear tablas si no existen
 db.exec(`
@@ -32,6 +34,7 @@ db.exec(`
         country TEXT DEFAULT 'Bolivia',
         device_type TEXT DEFAULT 'Móvil',
         voter_ip TEXT,
+        voter_uuid TEXT,
         user_agent TEXT,
         created_at TEXT NOT NULL,
         FOREIGN KEY (dish_id) REFERENCES dishes(id)
@@ -41,6 +44,16 @@ db.exec(`
     CREATE INDEX IF NOT EXISTS idx_votes_district ON votes(district);
     CREATE INDEX IF NOT EXISTS idx_votes_created ON votes(created_at);
 `);
+
+// Migración segura si la columna voter_uuid no existía previamente en la base de datos
+try {
+    db.exec('ALTER TABLE votes ADD COLUMN voter_uuid TEXT;');
+} catch {
+    // Columna ya existe o fue creada con la tabla
+}
+
+// Crear índice sobre voter_uuid después de asegurar la columna
+db.exec('CREATE INDEX IF NOT EXISTS idx_votes_voter ON votes(voter_uuid);');
 
 // Platos oficiales en competición
 const OFFICIAL_DISHES = [
@@ -188,30 +201,55 @@ const dbService = {
         }));
     },
 
-    // Registrar un nuevo voto
-    registerVote({ dishId, district, city = 'El Alto', country = 'Bolivia', deviceType = 'Móvil', ip = '127.0.0.1', userAgent = '' }) {
+    // Comprobar si un identificador de votante ya votó por un plato específico
+    hasVoted(voterUuid, dishId) {
+        if (!voterUuid) return false;
+        const row = db.prepare('SELECT 1 FROM votes WHERE voter_uuid = ? AND dish_id = ? LIMIT 1').get(voterUuid, dishId);
+        return Boolean(row);
+    },
+
+    // Resumen liviano de ranking para broadcast SSE en tiempo real
+    getRankingSummary() {
+        const dishes = this.getDishesWithVotes();
+        const sorted = [...dishes].sort((a, b) => b.votes - a.votes);
+        const totalVotes = sorted.reduce((acc, d) => acc + d.votes, 0);
+        return {
+            dishes: sorted,
+            totalVotes,
+            updatedAt: new Date().toISOString()
+        };
+    },
+
+    // Registrar un nuevo voto oficial
+    registerVote({ dishId, district, city = 'El Alto', country = 'Bolivia', deviceType = 'Móvil', ip = '127.0.0.1', voterUuid = null, userAgent = '' }) {
         const dish = db.prepare('SELECT id, name FROM dishes WHERE id = ?').get(dishId);
         if (!dish) {
             throw new Error(`El plato con ID '${dishId}' no existe.`);
         }
 
+        if (voterUuid && this.hasVoted(voterUuid, dishId)) {
+            throw new Error(`Ya has emitido tu voto por ${dish.name}. ¡Gracias por apoyar!`);
+        }
+
         const createdAt = new Date().toISOString();
 
         const insert = db.prepare(`
-            INSERT INTO votes (dish_id, district, city, country, device_type, voter_ip, user_agent, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO votes (dish_id, district, city, country, device_type, voter_ip, voter_uuid, user_agent, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
 
-        insert.run(dishId, district, city, country, deviceType, ip, userAgent, createdAt);
+        insert.run(dishId, district, city, country, deviceType, ip, voterUuid, userAgent, createdAt);
 
-        // Obtener el nuevo total de votos para este plato
-        const newTotal = db.prepare('SELECT COUNT(*) as count FROM votes WHERE dish_id = ?').get(dishId).count;
+        // Obtener el nuevo total de votos para este plato y el ranking completo
+        const newTotal = Number(db.prepare('SELECT COUNT(*) as count FROM votes WHERE dish_id = ?').get(dishId).count);
+        const ranking = this.getRankingSummary();
 
         return {
             success: true,
             dishId,
             dishName: dish.name,
-            newVotes: Number(newTotal),
+            newVotes: newTotal,
+            ranking,
             timestamp: createdAt
         };
     },

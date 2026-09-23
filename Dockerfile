@@ -1,5 +1,5 @@
-# Imagen base oficial con Node.js 24 (soporte nativo de node:sqlite)
-FROM node:24-alpine
+# Imagen base oficial con Node.js 22 LTS (soporte nativo y estable de node:sqlite)
+FROM node:22-alpine
 
 # Definir directorio de trabajo
 WORKDIR /app

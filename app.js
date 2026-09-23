@@ -71,11 +71,26 @@ const DISTRICT_OPTIONS = [
     { id: 'EXT', label: 'Fuera del País', sub: 'Residentes en el exterior' }
 ];
 
+// Identificador único y seguro de votante por dispositivo
+function getOrCreateVoterUuid() {
+    let uuid = localStorage.getItem('gamea_voter_uuid');
+    if (!uuid) {
+        uuid = 'voter_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
+        localStorage.setItem('gamea_voter_uuid', uuid);
+    }
+    return uuid;
+}
+const voterUuid = getOrCreateVoterUuid();
+
 // Estado de la aplicación
 let dishes = [...DEFAULT_DISHES];
 let selectedDishForVote = null;
 let selectedDistrict = localStorage.getItem('gamea_last_district') || 'Distrito 1 (Ciudad Satélite / Tejada)';
 let hasVotedMap = JSON.parse(localStorage.getItem('gamea_voted_dishes') || '{}');
+
+// Clientes y temporizadores de sincronización
+let sseSource = null;
+let pollFallbackTimer = null;
 
 // Elementos del DOM
 const grid = document.getElementById('dishes-grid');
@@ -94,11 +109,75 @@ async function init() {
     renderDistrictGrid();
     setupModalEvents();
 
-    // Cargar datos reales desde la base de datos
+    // 1. Carga inicial rápida de datos
     await fetchLiveDishes();
 
-    // Actualización periódica silenciosa (cada 12 segundos) para mantener sincronía multiusuario
-    setInterval(fetchLiveDishes, 12000);
+    // 2. Conexión en vivo por Server-Sent Events (SSE)
+    connectRealtimeStream();
+}
+
+// Conexión en tiempo real por Server-Sent Events (SSE)
+function connectRealtimeStream() {
+    if (!('EventSource' in window)) {
+        startPollingFallback();
+        return;
+    }
+
+    try {
+        if (sseSource) sseSource.close();
+        sseSource = new EventSource('/api/stream');
+
+        // Estado inicial al conectar
+        sseSource.addEventListener('init', (e) => {
+            try {
+                const data = JSON.parse(e.data);
+                if (data && Array.isArray(data.dishes)) {
+                    dishes = data.dishes;
+                    renderDishes();
+                    renderRanking();
+                }
+            } catch (err) {
+                console.error('Error parseando init SSE:', err);
+            }
+        });
+
+        // Actualización instantánea cuando cualquier ciudadano vota
+        sseSource.addEventListener('vote_update', (e) => {
+            try {
+                const data = JSON.parse(e.data);
+                if (!data) return;
+
+                const targetDish = dishes.find(d => d.id === data.dishId);
+                if (targetDish) {
+                    targetDish.votes = data.newVotes;
+                    animateVoteChange(data.dishId, data.newVotes);
+                }
+
+                if (data.ranking && Array.isArray(data.ranking.dishes)) {
+                    dishes = data.ranking.dishes;
+                }
+
+                renderRanking();
+            } catch (err) {
+                console.error('Error procesando vote_update SSE:', err);
+            }
+        });
+
+        sseSource.onerror = () => {
+            // Reintento silencioso con fallback a polling si hay corte de red
+            if (sseSource) sseSource.close();
+            sseSource = null;
+            startPollingFallback();
+            setTimeout(connectRealtimeStream, 8000);
+        };
+    } catch {
+        startPollingFallback();
+    }
+}
+
+function startPollingFallback() {
+    if (pollFallbackTimer) return;
+    pollFallbackTimer = setInterval(fetchLiveDishes, 10000);
 }
 
 // Obtener platos y votos reales desde la API
@@ -362,6 +441,7 @@ async function submitVote() {
     }
 
     try {
+        const hpVal = document.getElementById('hp-field')?.value || '';
         const response = await fetch('/api/vote', {
             method: 'POST',
             headers: {
@@ -370,7 +450,9 @@ async function submitVote() {
             body: JSON.stringify({
                 dishId,
                 district,
-                city: district.includes('La Paz') ? 'La Paz' : (district.includes('Otra') ? 'Interior' : 'El Alto')
+                city: district.includes('La Paz') ? 'La Paz' : (district.includes('Otra') ? 'Interior' : 'El Alto'),
+                voterUuid,
+                hp_field: hpVal
             })
         });
 
@@ -398,17 +480,7 @@ async function submitVote() {
         }
     } catch (err) {
         console.error('Error al registrar voto:', err);
-        // Fallback optimista si no hay conexión al backend
-        const targetDish = dishes.find(d => d.id === dishId);
-        if (targetDish) {
-            targetDish.votes += 1;
-            updateCardAfterVote(dishId, targetDish.votes);
-            renderRanking();
-        }
-        hasVotedMap[dishId] = true;
-        localStorage.setItem('gamea_voted_dishes', JSON.stringify(hasVotedMap));
-        closeModal();
-        showToast(`¡Voto anotado con éxito para ${dishName}!`, 'success');
+        showToast('Error de conexión al registrar voto. Por favor reintenta.', 'error');
     } finally {
         if (btnModalConfirm) {
             btnModalConfirm.disabled = false;
@@ -417,8 +489,8 @@ async function submitVote() {
     }
 }
 
-// Actualizar tarjeta después del voto con animación
-function updateCardAfterVote(dishId, newCount) {
+// Animación de incremento de votos en tiempo real por SSE
+function animateVoteChange(dishId, newCount) {
     const countEl = document.getElementById(`count-${dishId}`);
     if (countEl) {
         countEl.textContent = newCount;
@@ -429,6 +501,11 @@ function updateCardAfterVote(dishId, newCount) {
             changeEl.classList.add('active');
         }
     }
+}
+
+// Actualizar tarjeta después del voto con animación
+function updateCardAfterVote(dishId, newCount) {
+    animateVoteChange(dishId, newCount);
 
     const voteBtn = document.getElementById(`btn-vote-${dishId}`);
     if (voteBtn) {
