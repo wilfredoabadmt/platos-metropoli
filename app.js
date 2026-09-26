@@ -11,42 +11,42 @@ const DEFAULT_DISHES = [
         name: 'Fiambre',
         description: 'Tradicional plato alteño, con asado, queso frito, huevo duro, fideo y papa.',
         image: 'assets/fiambre.jpg',
-        votes: 0
+        votes: 68
     },
     {
         id: 'aji-fideo',
         name: 'Ají de Fideo con Chuño',
         description: 'Delicioso fideo tostado bañado en ají colorado, acompañado de chuño y carne.',
         image: 'assets/aji-fideo.jpg',
-        votes: 0
+        votes: 139
     },
     {
         id: 'apthapi',
         name: 'Apthapi Andino',
         description: 'Comida comunitaria ancestral con papa, chuño, habas, queso, huevo y carnes variadas.',
         image: 'assets/apthapi.jpg',
-        votes: 0
+        votes: 141
     },
     {
         id: 'wallake',
         name: 'Wallake',
         description: 'Caldo de pescado karachi con ají amarillo, papa, chuño y muña.',
         image: 'assets/wallake.jpg',
-        votes: 0
+        votes: 103
     },
     {
         id: 'pesque',
         name: 'Pesque de Quinua',
         description: 'Nutritivo puré de quinua real preparado con leche y abundante queso.',
         image: 'assets/pesque.jpg',
-        votes: 0
+        votes: 97
     },
     {
         id: 'sopa-fideo',
         name: 'Sopita de Fideo',
         description: 'Clásica y reconfortante sopa con carne, verduras y fideo tostado. La "sajra hora".',
         image: 'assets/sopa-fideo.jpg',
-        votes: 0
+        votes: 100
     }
 ];
 
