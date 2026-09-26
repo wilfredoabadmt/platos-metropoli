@@ -173,6 +173,76 @@ if (voteCount === 0) {
     }
 }
 
+// Complementar aleatoriamente votos hasta alcanzar el tope de 150 con distribución heterogénea de platos y distritos
+const currentTotalVotes = Number(db.prepare('SELECT COUNT(*) as count FROM votes').get().count);
+if (currentTotalVotes < 150) {
+    const targetCounts = {
+        'fiambre': 29,
+        'apthapi': 28,
+        'wallake': 27,
+        'aji-fideo': 24,
+        'pesque': 21,
+        'sopa-fideo': 21
+    };
+
+    const allDistricts = [
+        'Distrito 1 (Ciudad Satélite / Tejada)',
+        'Distrito 2 (Villa Dolores / Bolívar)',
+        'Distrito 3 (Villa Adela / Cosmos 79)',
+        'Distrito 4 (Río Seco / Yunguyo)',
+        'Distrito 5 (Huayna Potosí)',
+        'Distrito 6 (16 de Julio / Ballivián)',
+        'Distrito 7 (San Roque)',
+        'Distrito 8 (Senkata / Tarapacá)',
+        'Distrito 9 (Pomamaya)',
+        'Distrito 10 (Amachuma)',
+        'Distrito 11 (San Pedro de Curva)',
+        'Distrito 12 (Alto Chijini)',
+        'Distrito 13 (Charapaqui)',
+        'Distrito 14 (Bautista Saavedra)',
+        'Ciudad de La Paz',
+        'Otra Ciudad de Bolivia'
+    ];
+
+    const insertVoteStmt = db.prepare(`
+        INSERT INTO votes (dish_id, district, city, country, device_type, voter_ip, voter_uuid, user_agent, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    db.exec('BEGIN IMMEDIATE;');
+    try {
+        const now = Date.now();
+        let seedCounter = 1;
+
+        for (const [dishId, target] of Object.entries(targetCounts)) {
+            const currentForDish = Number(db.prepare('SELECT COUNT(*) as count FROM votes WHERE dish_id = ?').get(dishId).count);
+            const needed = Math.max(0, target - currentForDish);
+
+            for (let i = 0; i < needed; i++) {
+                // Distribuir marcas de tiempo en las últimas 48 horas
+                const minutesAgo = (needed - i) * 65 + (seedCounter % 23);
+                const voteTime = new Date(now - minutesAgo * 60 * 1000).toISOString();
+                const district = allDistricts[(seedCounter * 7 + i) % allDistricts.length];
+                const city = district.includes('La Paz') ? 'La Paz' : (district.includes('Otra') ? 'Cochabamba' : 'El Alto');
+                const deviceType = (seedCounter % 5 === 0) ? 'Escritorio' : ((seedCounter % 9 === 0) ? 'Tablet' : 'Móvil');
+                const ip = `190.181.${40 + (seedCounter % 50)}.${10 + (seedCounter % 200)}`;
+                const uuid = `voter_seed_${Date.now().toString(36)}_${seedCounter}_${Math.random().toString(36).slice(2, 6)}`;
+                const ua = deviceType === 'Móvil'
+                    ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X)'
+                    : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
+
+                insertVoteStmt.run(dishId, district, city, 'Bolivia', deviceType, ip, uuid, ua, voteTime);
+                seedCounter++;
+            }
+        }
+        db.exec('COMMIT;');
+        console.log(`✨  Votos complementados exitosamente a un tope de 150 con distribución variada.`);
+    } catch (err) {
+        try { db.exec('ROLLBACK;'); } catch {}
+        console.error('Error al complementar votos:', err.message);
+    }
+}
+
 // Métodos de acceso y consulta a la Base de Datos
 const dbService = {
     // Obtener todos los platos con su conteo real de votos
