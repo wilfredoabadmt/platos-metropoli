@@ -11,42 +11,42 @@ const DEFAULT_DISHES = [
         name: 'Fiambre',
         description: 'Tradicional plato alteño, con asado, queso frito, huevo duro, fideo y papa.',
         image: 'assets/fiambre.jpg',
-        votes: 10
+        votes: 0
     },
     {
         id: 'aji-fideo',
         name: 'Ají de Fideo con Chuño',
         description: 'Delicioso fideo tostado bañado en ají colorado, acompañado de chuño y carne.',
         image: 'assets/aji-fideo.jpg',
-        votes: 9
+        votes: 0
     },
     {
         id: 'apthapi',
         name: 'Apthapi Andino',
         description: 'Comida comunitaria ancestral con papa, chuño, habas, queso, huevo y carnes variadas.',
         image: 'assets/apthapi.jpg',
-        votes: 10
+        votes: 0
     },
     {
         id: 'wallake',
         name: 'Wallake',
         description: 'Caldo de pescado karachi con ají amarillo, papa, chuño y muña.',
         image: 'assets/wallake.jpg',
-        votes: 8
+        votes: 0
     },
     {
         id: 'pesque',
         name: 'Pesque de Quinua',
         description: 'Nutritivo puré de quinua real preparado con leche y abundante queso.',
         image: 'assets/pesque.jpg',
-        votes: 7
+        votes: 0
     },
     {
         id: 'sopa-fideo',
         name: 'Sopita de Fideo',
         description: 'Clásica y reconfortante sopa con carne, verduras y fideo tostado. La "sajra hora".',
         image: 'assets/sopa-fideo.jpg',
-        votes: 9
+        votes: 0
     }
 ];
 
@@ -77,7 +77,7 @@ function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
-    } catch {}
+    } catch { }
     return null;
 }
 
@@ -86,7 +86,7 @@ function setCookie(name, value, days = 90) {
         const d = new Date();
         d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
         document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/;SameSite=Lax`;
-    } catch {}
+    } catch { }
 }
 
 // Identificador único y resiliente de votante (persiste en LocalStorage y Cookies)
@@ -94,7 +94,7 @@ function getOrCreateVoterUuid() {
     let uuid = null;
     try {
         uuid = localStorage.getItem('gamea_voter_uuid');
-    } catch {}
+    } catch { }
     if (!uuid) {
         uuid = getCookie('gamea_voter_uuid');
     }
@@ -103,7 +103,7 @@ function getOrCreateVoterUuid() {
     }
     try {
         localStorage.setItem('gamea_voter_uuid', uuid);
-    } catch {}
+    } catch { }
     setCookie('gamea_voter_uuid', uuid, 90);
     return uuid;
 }
@@ -601,7 +601,7 @@ async function submitVote() {
         hasVotedMap[dishId] = true;
         try {
             localStorage.setItem('gamea_voted_dishes', JSON.stringify(hasVotedMap));
-        } catch {}
+        } catch { }
 
         const targetDish = dishes.find(d => d.id === dishId);
         const estVotes = (targetDish?.votes || 0) + 1;
