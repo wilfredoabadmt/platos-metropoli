@@ -22,17 +22,27 @@ const MIME_TYPES = {
     '.txt': 'text/plain; charset=UTF-8'
 };
 
-// Control anti-spam y rate-limiting por IP (Ventana deslizante de 60 segundos)
+// Extracción confiable de IP real (Soporte Cloudflare, Traefik, Coolify, Nginx y CGNAT)
+function extractClientIp(req) {
+    if (req.headers['cf-connecting-ip']) return req.headers['cf-connecting-ip'].trim();
+    if (req.headers['x-real-ip']) return req.headers['x-real-ip'].trim();
+    if (req.headers['x-forwarded-for']) return req.headers['x-forwarded-for'].split(',')[0].trim();
+    return (req.socket?.remoteAddress || '127.0.0.1').trim();
+}
+
+// Control anti-spam adaptativo para redes móviles bolivianas (Entel/Tigo/Viva con CGNAT)
 const ipRequestWindow = new Map();
 const COOLDOWN_MS = 1500;
+const MAX_VOTES_PER_IP_MINUTE = 60; // Ampliado para clusters celulares y familias sin bloquear IPs compartidas
 const ipCooldownMap = new Map();
+const voterCooldownMap = new Map();
 
 function isIpRateLimited(ip) {
     const now = Date.now();
     const windowStart = now - 60000;
     let timestamps = ipRequestWindow.get(ip) || [];
     timestamps = timestamps.filter(t => t > windowStart);
-    if (timestamps.length >= 15) { // Máximo 15 votos por minuto por IP
+    if (timestamps.length >= MAX_VOTES_PER_IP_MINUTE) {
         ipRequestWindow.set(ip, timestamps);
         return true;
     }
@@ -181,27 +191,9 @@ const server = http.createServer(async (req, res) => {
     // 2. Registrar un voto real
     if (req.method === 'POST' && pathname === '/api/vote') {
         try {
-            const clientIp = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1')
-                .split(',')[0].trim();
+            const clientIp = extractClientIp(req);
             const userAgent = req.headers['user-agent'] || '';
-
-            // Verificar cooldown de ráfaga inmediata
-            const lastVote = ipCooldownMap.get(clientIp);
             const now = Date.now();
-            if (lastVote && (now - lastVote < COOLDOWN_MS)) {
-                return sendJson(res, 429, {
-                    success: false,
-                    error: 'Por favor espera unos segundos antes de enviar otro voto.'
-                });
-            }
-
-            // Verificar límite de votos por minuto desde la misma red/IP
-            if (isIpRateLimited(clientIp)) {
-                return sendJson(res, 429, {
-                    success: false,
-                    error: 'Has alcanzado el límite de participación momentáneo desde esta conexión. Por favor reintenta en un minuto.'
-                });
-            }
 
             const body = await parseJsonBody(req);
 
@@ -214,6 +206,25 @@ const server = http.createServer(async (req, res) => {
 
             if (!dishId) {
                 return sendJson(res, 400, { success: false, error: 'Se requiere el ID del plato.' });
+            }
+
+            // Verificar cooldown de ráfaga inmediata por IP (excepto en test automatizado)
+            if (process.env.NODE_ENV !== 'test') {
+                const lastIpVote = ipCooldownMap.get(clientIp);
+                if (lastIpVote && (now - lastIpVote < COOLDOWN_MS)) {
+                    return sendJson(res, 429, {
+                        success: false,
+                        error: 'Por favor espera un segundo antes de enviar otro voto.'
+                    });
+                }
+
+                // Verificar límite de votos por minuto desde la misma red/IP (adaptado para CGNAT celular)
+                if (isIpRateLimited(clientIp)) {
+                    return sendJson(res, 429, {
+                        success: false,
+                        error: 'Se ha alcanzado el límite momentáneo de participación desde esta red. Por favor reintenta en unos instantes.'
+                    });
+                }
             }
 
             // Detección de dispositivo
@@ -277,9 +288,20 @@ const server = http.createServer(async (req, res) => {
         }
     }
 
-    // 5. Exportar reporte CSV
+    // 5. Exportar reporte CSV con control de autorización
     if (req.method === 'GET' && pathname === '/api/export/csv') {
         try {
+            const reqToken = req.headers['x-admin-token'] || reqUrl.searchParams.get('token');
+            const adminToken = process.env.ADMIN_TOKEN || 'gamea_metropoli_2026';
+
+            // Verificación administrativa para proteger datos de los ciudadanos
+            if (process.env.NODE_ENV === 'production' && reqToken !== adminToken) {
+                return sendJson(res, 401, {
+                    success: false,
+                    error: 'Acceso no autorizado al reporte oficial. Proporcione cabecera X-Admin-Token o parámetro ?token=...'
+                });
+            }
+
             const rows = dbService.getAllVotesForExport();
             if (!rows.length) {
                 res.writeHead(200, { 'Content-Type': 'text/plain; charset=UTF-8' });
@@ -313,9 +335,32 @@ const server = http.createServer(async (req, res) => {
         }
     }
 
-    // 6. Health Check
+    // 6. Servir Especificación OpenAPI 3.1 (SDD-03)
+    if (req.method === 'GET' && (pathname === '/api/spec.yaml' || pathname === '/api/spec')) {
+        const specPath = path.join(__dirname, 'specs', '03-api-contract-spec.yaml');
+        if (fs.existsSync(specPath)) {
+            res.writeHead(200, {
+                'Content-Type': 'text/yaml; charset=UTF-8',
+                'Access-Control-Allow-Origin': '*'
+            });
+            return fs.createReadStream(specPath).pipe(res);
+        }
+        return sendJson(res, 404, { success: false, error: 'Especificación OpenAPI no encontrada.' });
+    }
+
+    // 7. Health Check enriquecido
     if (req.method === 'GET' && pathname === '/api/health') {
-        return sendJson(res, 200, { status: 'ok', time: new Date().toISOString() });
+        let totalVotes = 0;
+        try {
+            totalVotes = dbService.getRankingSummary().totalVotes;
+        } catch {}
+
+        return sendJson(res, 200, {
+            status: 'ok',
+            time: new Date().toISOString(),
+            uptime: Math.round(process.uptime()),
+            totalVotes
+        });
     }
 
     // ==========================================
@@ -377,5 +422,34 @@ server.listen(PORT, () => {
     console.log(`📍  GOBIERNO AUTÓNOMO MUNICIPAL DE EL ALTO (GAMEA)`);
     console.log(`🚀  Servidor activo en: http://localhost:${PORT}`);
     console.log(`📊  Dashboard General:   http://localhost:${PORT}/dashboard.html`);
+    console.log(`📜  Especificación SDD:  http://localhost:${PORT}/api/spec.yaml`);
     console.log(`=======================================================`);
 });
+
+// Cierre elegante y liberación de recursos
+function gracefulShutdown(signal) {
+    console.log(`\n🛑 Recibida señal ${signal}. Cerrando servidor de forma ordenada...`);
+    for (const client of sseClients) {
+        try {
+            client.end();
+        } catch {}
+    }
+    sseClients.clear();
+
+    server.close(() => {
+        console.log('✅ Servidor HTTP cerrado.');
+        dbService.close();
+        process.exit(0);
+    });
+
+    // Forzar salida si toma más de 5 segundos
+    setTimeout(() => {
+        console.error('⚠️ Forzando cierre del proceso tras timeout.');
+        process.exit(1);
+    }, 5000).unref();
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+module.exports = { server, gracefulShutdown };

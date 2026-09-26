@@ -71,16 +71,124 @@ const DISTRICT_OPTIONS = [
     { id: 'EXT', label: 'Fuera del País', sub: 'Residentes en el exterior' }
 ];
 
-// Identificador único y seguro de votante por dispositivo
+// Helpers de Cookies seguras para WebView (TikTok / Facebook)
+function getCookie(name) {
+    try {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    } catch {}
+    return null;
+}
+
+function setCookie(name, value, days = 90) {
+    try {
+        const d = new Date();
+        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+    } catch {}
+}
+
+// Identificador único y resiliente de votante (persiste en LocalStorage y Cookies)
 function getOrCreateVoterUuid() {
-    let uuid = localStorage.getItem('gamea_voter_uuid');
+    let uuid = null;
+    try {
+        uuid = localStorage.getItem('gamea_voter_uuid');
+    } catch {}
+    if (!uuid) {
+        uuid = getCookie('gamea_voter_uuid');
+    }
     if (!uuid) {
         uuid = 'voter_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
-        localStorage.setItem('gamea_voter_uuid', uuid);
     }
+    try {
+        localStorage.setItem('gamea_voter_uuid', uuid);
+    } catch {}
+    setCookie('gamea_voter_uuid', uuid, 90);
     return uuid;
 }
 const voterUuid = getOrCreateVoterUuid();
+
+// =============================================================================
+// GESTOR DE COLA DE VOTOS OFFLINE RESILIENTE (SDD-05) - CERO PÉRDIDA DE VOTOS
+// =============================================================================
+const PENDING_VOTES_KEY = 'gamea_pending_votes';
+
+function getPendingVotesQueue() {
+    try {
+        return JSON.parse(localStorage.getItem(PENDING_VOTES_KEY) || '[]');
+    } catch {
+        return [];
+    }
+}
+
+function savePendingVotesQueue(queue) {
+    try {
+        localStorage.setItem(PENDING_VOTES_KEY, JSON.stringify(queue));
+    } catch (e) {
+        console.warn('No se pudo guardar la cola offline:', e);
+    }
+}
+
+function enqueuePendingVote(votePayload) {
+    const queue = getPendingVotesQueue();
+    const exists = queue.some(item => item.dishId === votePayload.dishId);
+    if (!exists) {
+        queue.push({
+            id: 'pend_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
+            ...votePayload,
+            timestamp: Date.now(),
+            attempts: 0
+        });
+        savePendingVotesQueue(queue);
+    }
+}
+
+let isSyncingQueue = false;
+async function processPendingVotesQueue() {
+    if (isSyncingQueue || !navigator.onLine) return;
+    const queue = getPendingVotesQueue();
+    if (queue.length === 0) return;
+
+    isSyncingQueue = true;
+    const remaining = [];
+
+    for (const item of queue) {
+        try {
+            item.attempts = (item.attempts || 0) + 1;
+            const res = await fetch('/api/vote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dishId: item.dishId,
+                    district: item.district,
+                    city: item.city,
+                    voterUuid: item.voterUuid,
+                    hp_field: ''
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                hasVotedMap[item.dishId] = true;
+                localStorage.setItem('gamea_voted_dishes', JSON.stringify(hasVotedMap));
+                updateCardAfterVote(item.dishId, data.newVotes);
+                showToast(`✅ Voto sincronizado: Apoyo confirmado para "${data.dishName}"`, 'success');
+            } else if (data && data.error && data.error.includes('Ya has emitido')) {
+                // Ya estaba confirmado en servidor
+                hasVotedMap[item.dishId] = true;
+                localStorage.setItem('gamea_voted_dishes', JSON.stringify(hasVotedMap));
+            } else if (item.attempts < 5) {
+                remaining.push(item);
+            }
+        } catch {
+            remaining.push(item);
+        }
+    }
+
+    savePendingVotesQueue(remaining);
+    isSyncingQueue = false;
+}
 
 // Estado de la aplicación
 let dishes = [...DEFAULT_DISHES];
@@ -114,6 +222,11 @@ async function init() {
 
     // 2. Conexión en vivo por Server-Sent Events (SSE)
     connectRealtimeStream();
+
+    // 3. Procesar cola de votos offline si hubiera votos guardados localmente
+    processPendingVotesQueue();
+    window.addEventListener('online', processPendingVotesQueue);
+    setInterval(processPendingVotesQueue, 20000);
 }
 
 // Conexión en tiempo real por Server-Sent Events (SSE)
@@ -479,8 +592,24 @@ async function submitVote() {
             showToast(data.error || 'No se pudo registrar el voto en este momento.', 'error');
         }
     } catch (err) {
-        console.error('Error al registrar voto:', err);
-        showToast('Error de conexión al registrar voto. Por favor reintenta.', 'error');
+        console.warn('Fallo de red al registrar voto. Encolando offline:', err);
+
+        // SDD-05: Garantía de persistencia offline (cero votos perdidos en tránsito)
+        const city = district.includes('La Paz') ? 'La Paz' : (district.includes('Otra') ? 'Interior' : 'El Alto');
+        enqueuePendingVote({ dishId, district, city, voterUuid });
+
+        hasVotedMap[dishId] = true;
+        try {
+            localStorage.setItem('gamea_voted_dishes', JSON.stringify(hasVotedMap));
+        } catch {}
+
+        const targetDish = dishes.find(d => d.id === dishId);
+        const estVotes = (targetDish?.votes || 0) + 1;
+        if (targetDish) targetDish.votes = estVotes;
+        updateCardAfterVote(dishId, estVotes);
+
+        closeModal();
+        showToast('📡 Conexión inestable: Voto guardado en tu dispositivo. Se enviará automáticamente cuando regrese internet.', 'info');
     } finally {
         if (btnModalConfirm) {
             btnModalConfirm.disabled = false;

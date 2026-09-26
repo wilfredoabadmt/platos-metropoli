@@ -15,6 +15,7 @@ db.exec('PRAGMA journal_mode = WAL;');
 db.exec('PRAGMA foreign_keys = ON;');
 db.exec('PRAGMA busy_timeout = 5000;');
 db.exec('PRAGMA synchronous = NORMAL;');
+db.exec('PRAGMA wal_autocheckpoint = 1000;');
 
 // Crear tablas si no existen
 db.exec(`
@@ -52,8 +53,9 @@ try {
     // Columna ya existe o fue creada con la tabla
 }
 
-// Crear índice sobre voter_uuid después de asegurar la columna
+// Crear índices sobre voter_uuid y unicidad por plato
 db.exec('CREATE INDEX IF NOT EXISTS idx_votes_voter ON votes(voter_uuid);');
+db.exec('CREATE INDEX IF NOT EXISTS idx_votes_voter_dish ON votes(voter_uuid, dish_id);');
 
 // Platos oficiales en competición
 const OFFICIAL_DISHES = [
@@ -220,7 +222,7 @@ const dbService = {
         };
     },
 
-    // Registrar un nuevo voto oficial
+    // Registrar un nuevo voto oficial con transacción segura
     registerVote({ dishId, district, city = 'El Alto', country = 'Bolivia', deviceType = 'Móvil', ip = '127.0.0.1', voterUuid = null, userAgent = '' }) {
         const dish = db.prepare('SELECT id, name FROM dishes WHERE id = ?').get(dishId);
         if (!dish) {
@@ -233,12 +235,19 @@ const dbService = {
 
         const createdAt = new Date().toISOString();
 
-        const insert = db.prepare(`
-            INSERT INTO votes (dish_id, district, city, country, device_type, voter_ip, voter_uuid, user_agent, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
+        db.exec('BEGIN IMMEDIATE;');
+        try {
+            const insert = db.prepare(`
+                INSERT INTO votes (dish_id, district, city, country, device_type, voter_ip, voter_uuid, user_agent, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `);
 
-        insert.run(dishId, district, city, country, deviceType, ip, voterUuid, userAgent, createdAt);
+            insert.run(dishId, district, city, country, deviceType, ip, voterUuid, userAgent, createdAt);
+            db.exec('COMMIT;');
+        } catch (err) {
+            try { db.exec('ROLLBACK;'); } catch {}
+            throw err;
+        }
 
         // Obtener el nuevo total de votos para este plato y el ranking completo
         const newTotal = Number(db.prepare('SELECT COUNT(*) as count FROM votes WHERE dish_id = ?').get(dishId).count);
@@ -403,8 +412,48 @@ const dbService = {
             JOIN dishes d ON v.dish_id = d.id
             ORDER BY v.id ASC
         `).all();
+    },
+
+    // Checkpoint preventivo de WAL para evitar crecimiento desmedido en disco
+    checkpointWal(mode = 'PASSIVE') {
+        try {
+            db.exec(`PRAGMA wal_checkpoint(${mode});`);
+            return true;
+        } catch (err) {
+            console.error('Error al ejecutar checkpoint de WAL:', err.message);
+            return false;
+        }
+    },
+
+    // Cierre limpio de la base de datos
+    close() {
+        try {
+            this.checkpointWal('TRUNCATE');
+            db.close();
+            console.log('🔒  Base de datos cerrada limpiamente.');
+        } catch (err) {
+            console.error('Error al cerrar base de datos:', err.message);
+        }
     }
 };
+
+// Checkpoint automático cada 5 minutos en background (unref para no retener el event loop)
+const checkpointTimer = setInterval(() => {
+    dbService.checkpointWal('PASSIVE');
+}, 5 * 60 * 1000);
+if (checkpointTimer.unref) {
+    checkpointTimer.unref();
+}
+
+// Cierre elegante ante señales del sistema operativo
+let isExiting = false;
+function handleExit() {
+    if (isExiting) return;
+    isExiting = true;
+    dbService.close();
+}
+process.on('SIGINT', () => { handleExit(); process.exit(0); });
+process.on('SIGTERM', () => { handleExit(); process.exit(0); });
 
 module.exports = {
     db,

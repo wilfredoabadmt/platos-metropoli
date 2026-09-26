@@ -1,0 +1,295 @@
+openapi: 3.1.0
+info:
+  title: API Oficial Plato Metrópoli - El Alto
+  description: Contrato de servicios REST y Server-Sent Events (SSE) para el concurso gastronómico municipal de El Alto (GAMEA).
+  version: 1.1.0
+  contact:
+    name: Dirección de Comunicación - GAMEA
+    url: https://www.elalto.gob.bo
+servers:
+  - url: http://localhost:3000
+    description: Servidor Local
+  - url: https://platos.elalto.gob.bo
+    description: Servidor de Producción Municipal
+
+paths:
+  /api/health:
+    get:
+      summary: Verificación de estado del servicio
+      operationId: getHealth
+      responses:
+        '200':
+          description: Servicio saludable y operativo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  time:
+                    type: string
+                    format: date-time
+                  uptime:
+                    type: number
+                    example: 3600.5
+
+  /api/dishes:
+    get:
+      summary: Obtener lista oficial de platos candidatos con sus votos acumulados
+      operationId: getDishes
+      responses:
+        '200':
+          description: Lista de platos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  dishes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dish'
+
+  /api/vote:
+    post:
+      summary: Registrar un voto ciudadano
+      operationId: registerVote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoteRequest'
+      responses:
+        '200':
+          description: Voto registrado y confirmado en la base de datos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoteResponse'
+        '400':
+          description: Parámetros inválidos, trampa honeypot detectada o voto ya registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Demasiadas solicitudes consecutivas (Rate limit excedido)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stream:
+    get:
+      summary: Transmisión en tiempo real vía Server-Sent Events (SSE)
+      operationId: streamRealtime
+      responses:
+        '200':
+          description: Flujo de eventos unidireccional (eventos 'init', 'vote_update', 'ping')
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /api/dashboard/stats:
+    get:
+      summary: Estadísticas agregadas para el panel de monitoreo y gráficos
+      operationId: getDashboardStats
+      responses:
+        '200':
+          description: Métricas completas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  stats:
+                    $ref: '#/components/schemas/DashboardStats'
+
+  /api/dashboard/recent-votes:
+    get:
+      summary: Flujo de los últimos votos registrados
+      operationId: getRecentVotes
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Lista de votos recientes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  votes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RecentVote'
+
+  /api/export/csv:
+    get:
+      summary: Exportar reporte oficial de votos en formato CSV
+      operationId: exportCsv
+      parameters:
+        - name: token
+          in: query
+          required: false
+          schema:
+            type: string
+            description: Token administrativo de seguridad (o cabecera X-Admin-Token)
+      responses:
+        '200':
+          description: Archivo CSV con cabeceras y UTF-8 BOM
+          content:
+            text/csv:
+              schema:
+                type: string
+        '401':
+          description: Acceso no autorizado si se requiere token administrativo
+
+components:
+  schemas:
+    Dish:
+      type: object
+      properties:
+        id:
+          type: string
+          example: fiambre
+        name:
+          type: string
+          example: Fiambre
+        description:
+          type: string
+          example: Tradicional plato alteño con asado y queso frito...
+        image:
+          type: string
+          example: assets/fiambre.jpg
+        votes:
+          type: integer
+          example: 120
+
+    VoteRequest:
+      type: object
+      required:
+        - dishId
+        - district
+      properties:
+        dishId:
+          type: string
+          example: fiambre
+        district:
+          type: string
+          example: Distrito 1 (Ciudad Satélite / Tejada)
+        city:
+          type: string
+          example: El Alto
+        voterUuid:
+          type: string
+          example: voter_m3k2l9_9a8f
+        deviceType:
+          type: string
+          enum: [Móvil, Escritorio, Tablet]
+          example: Móvil
+        hp_field:
+          type: string
+          description: Campo Honeypot anti-bot. Debe estar vacío.
+
+    VoteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        dishId:
+          type: string
+          example: fiambre
+        dishName:
+          type: string
+          example: Fiambre
+        newVotes:
+          type: integer
+          example: 121
+        ranking:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: Ya has emitido tu voto por este plato.
+
+    DashboardStats:
+      type: object
+      properties:
+        totalVotes:
+          type: integer
+        last24hVotes:
+          type: integer
+        leader:
+          $ref: '#/components/schemas/Dish'
+        runnerUp:
+          $ref: '#/components/schemas/Dish'
+        topDistrict:
+          type: string
+        dishesVotes:
+          type: array
+          items:
+            type: object
+        districtVotes:
+          type: array
+          items:
+            type: object
+        deviceVotes:
+          type: array
+          items:
+            type: object
+        activityTimeline:
+          type: array
+          items:
+            type: object
+        hourlyActivity:
+          type: array
+          items:
+            type: object
+
+    RecentVote:
+      type: object
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+        district:
+          type: string
+        city:
+          type: string
+        device_type:
+          type: string
+        dish_name:
+          type: string
+        dish_image:
+          type: string
