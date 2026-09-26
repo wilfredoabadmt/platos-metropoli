@@ -4,8 +4,8 @@
 Plataforma web de participación ciudadana y votación digital en tiempo real para la elección del **"Plato Metrópoli"**, correspondiente a la primera versión del Plato Metrópoli y segunda versión del certamen del Plato Bandera del Gobierno Autónomo Municipal de El Alto (GAMEA).
 
 * **Organización Patrocinante:** Dirección de Comunicación (GAMEA), Dirección de Culturas, Unidad de Fomento a Iniciativas Artísticas y Culturales, y Unidad de Turismo.
-* **Período de Votación:** Del 16 de septiembre de 2026 al 15 de octubre de 2026 (23:59:59 BOT).
-* **Gran Revelación del Ganador:** 16 de octubre de 2026 en Café Urvas (Museo Antonio Paredes Candía).
+* **Período de Votación:** Del 16 de septiembre de 2026 al 08 de enero de 2027 (23:59:59 BOT).
+* **Gran Revelación del Ganador:** 08 de enero de 2027 en Café Urvas (Museo Antonio Paredes Candía).
 
 ---
 
@@ -75,4 +75,4 @@ Basados en la CITE: `GAMEA/SMEC/DC/UFIAC/118/2026` y la sesión de coordinación
 ## 4. Reglas de Negocio
 1. **RN-01 (Un voto por plato por dispositivo):** Un votante puede apoyar a su plato favorito. No se permite duplicar votos por el mismo plato desde el mismo dispositivo en el mismo concurso.
 2. **RN-02 (Tolerancia a Redes Celulares / CGNAT):** No se penaliza ni bloquea a usuarios por compartir la misma IP pública celular (Entel, Tigo, Viva). La detección de fraude combina UUID del cliente, rate-limit por ráfaga corta, y trampa honeypot invisible.
-3. **RN-03 (Horario y Cierre Oficial):** El sistema permite votos hasta el 15 de octubre de 2026 a las 23:59:59 (hora de Bolivia GMT-4).
+3. **RN-03 (Horario y Cierre Oficial):** El sistema permite votos hasta el 08 de enero de 2027 a las 23:59:59 (hora de Bolivia GMT-4).

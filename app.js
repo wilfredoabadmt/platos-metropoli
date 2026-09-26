@@ -312,10 +312,10 @@ async function fetchLiveDishes() {
     }
 }
 
-// Cuenta regresiva al 16 de octubre de 2026 (Gran revelación en Café Urvas)
+// Cuenta regresiva al 08 de enero de 2027 (Gran revelación del Plato Metrópoli)
 function initCountdown() {
-    // 16 de octubre a las 10:00:00 (Mes 9 en JS Date es Octubre)
-    const target = new Date(2026, 9, 16, 10, 0, 0).getTime();
+    // 08 de enero de 2027 a las 23:59:59 (Mes 0 en JS Date es Enero)
+    const target = new Date(2027, 0, 8, 23, 59, 59).getTime();
 
     const daysEl = document.getElementById('days');
     const hoursEl = document.getElementById('hours');
