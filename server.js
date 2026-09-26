@@ -1,7 +1,7 @@
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
-const { dbService } = require('./data/db.js');
+const { dbService } = require('./lib/db.js');
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = __dirname;

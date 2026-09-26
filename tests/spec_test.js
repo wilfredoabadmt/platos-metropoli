@@ -7,7 +7,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('node:http');
-const { dbService } = require('../data/db.js');
+const { dbService } = require('../lib/db.js');
 
 const PORT = 3099;
 process.env.PORT = String(PORT);
