@@ -368,6 +368,9 @@ const server = http.createServer(async (req, res) => {
     // ==========================================
     let filePath = pathname === '/' ? '/index.html' : pathname;
     if (filePath === '/dashboard') filePath = '/dashboard.html';
+    if (filePath === '/favicon.ico' && !fs.existsSync(path.join(PUBLIC_DIR, 'favicon.ico'))) {
+        filePath = '/images/123logoplato.webp';
+    }
 
     const safePath = path.normalize(path.join(PUBLIC_DIR, filePath));
 
