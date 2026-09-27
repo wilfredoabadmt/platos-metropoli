@@ -412,8 +412,24 @@ const server = http.createServer(async (req, res) => {
         });
 
         const stream = fs.createReadStream(safePath);
+        stream.on('error', (streamErr) => {
+            console.error('Error al transmitir archivo estático:', streamErr.message);
+            if (!res.headersSent) {
+                res.writeHead(500, { 'Content-Type': 'text/plain; charset=UTF-8' });
+                res.end('500 Error Interno');
+            }
+        });
         stream.pipe(res);
     });
+});
+
+// Captura global de excepciones no controladas para evitar caídas del proceso
+process.on('uncaughtException', (err) => {
+    console.error('⚠️ [CRITICAL] Excepción no capturada capturada por guardián:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('⚠️ [WARN] Rechazo de promesa no capturado en:', promise, 'razón:', reason);
 });
 
 server.listen(PORT, () => {
