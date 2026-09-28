@@ -80,6 +80,9 @@ async function loadDashboardData() {
                 renderKpis(statsData.stats);
                 renderCharts(statsData.stats);
             }
+        } else {
+            console.warn(`Respuesta no exitosa de /api/dashboard/stats: ${statsRes.status}`);
+            if (kpiLast24h) kpiLast24h.textContent = `Error ${statsRes.status}: Verificando conexión...`;
         }
 
         if (recentRes.ok) {
@@ -90,6 +93,7 @@ async function loadDashboardData() {
         }
     } catch (err) {
         console.error('Error al cargar datos del dashboard:', err);
+        if (kpiLast24h) kpiLast24h.textContent = 'Error de conexión con el servidor (Reintentando...)';
     }
 }
 
