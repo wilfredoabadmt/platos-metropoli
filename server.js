@@ -146,7 +146,10 @@ const server = http.createServer(async (req, res) => {
     }
 
     const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost:3000'}`);
-    const pathname = reqUrl.pathname;
+    let pathname = reqUrl.pathname;
+    if (pathname.length > 1 && pathname.endsWith('/')) {
+        pathname = pathname.replace(/\/+$/, '');
+    }
 
     // ==========================================
     // RUTAS DE LA API REST Y TIEMPO REAL
