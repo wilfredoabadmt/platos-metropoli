@@ -38,9 +38,38 @@ const votesTbody = document.getElementById('votes-tbody');
 const btnRefresh = document.getElementById('btn-refresh');
 const refreshIcon = document.getElementById('refresh-icon');
 
+let dashboardSseSource = null;
+
+// Conexión Server-Sent Events (SSE) para sincronización multi-pantalla en tiempo real
+function connectDashboardSse() {
+    if (!('EventSource' in window)) return;
+    try {
+        if (dashboardSseSource) dashboardSseSource.close();
+        dashboardSseSource = new EventSource('/api/stream');
+
+        dashboardSseSource.addEventListener('init', () => {
+            loadDashboardData();
+        });
+
+        // Actualización instantánea sincronizada al segundo con las demás pantallas
+        dashboardSseSource.addEventListener('vote_update', () => {
+            loadDashboardData();
+        });
+
+        dashboardSseSource.onerror = () => {
+            if (dashboardSseSource) dashboardSseSource.close();
+            dashboardSseSource = null;
+            setTimeout(connectDashboardSse, 8000);
+        };
+    } catch (err) {
+        console.warn('SSE no disponible en dashboard, usando sondeo regular:', err);
+    }
+}
+
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboardData();
+    connectDashboardSse();
 
     // Actualización manual al pulsar el botón
     if (btnRefresh) {
@@ -49,8 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Auto-actualización silenciosa en tiempo real cada 10 segundos
-    setInterval(loadDashboardData, 10000);
+    // Auto-actualización de respaldo cada 15 segundos
+    setInterval(loadDashboardData, 15000);
 });
 
 // Animación del botón de refresco

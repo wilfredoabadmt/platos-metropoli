@@ -260,14 +260,24 @@ function connectRealtimeStream() {
                 const data = JSON.parse(e.data);
                 if (!data) return;
 
-                const targetDish = dishes.find(d => d.id === data.dishId);
-                if (targetDish) {
-                    targetDish.votes = data.newVotes;
-                    animateVoteChange(data.dishId, data.newVotes);
-                }
-
                 if (data.ranking && Array.isArray(data.ranking.dishes)) {
                     dishes = data.ranking.dishes;
+                    // Sincronizar todos los contadores de tarjetas en todas las pantallas
+                    dishes.forEach(d => {
+                        const countEl = document.getElementById(`count-${d.id}`);
+                        if (countEl && Number(countEl.textContent) !== d.votes) {
+                            countEl.textContent = d.votes;
+                        }
+                    });
+                } else {
+                    const targetDish = dishes.find(d => d.id === data.dishId);
+                    if (targetDish) {
+                        targetDish.votes = data.newVotes;
+                    }
+                }
+
+                if (data.dishId && data.newVotes) {
+                    animateVoteChange(data.dishId, data.newVotes);
                 }
 
                 renderRanking();

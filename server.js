@@ -1,6 +1,7 @@
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
 const { dbService } = require('./lib/db.js');
 
 const PORT = process.env.PORT || 3000;
@@ -412,9 +413,10 @@ const server = http.createServer(async (req, res) => {
         const ext = path.extname(safePath).toLowerCase();
         const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
+        const isAppCode = ['.html', '.js', '.css'].includes(ext);
         res.writeHead(200, {
             'Content-Type': contentType,
-            'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=3600'
+            'Cache-Control': isAppCode ? 'no-cache, must-revalidate' : 'public, max-age=86400'
         });
 
         const stream = fs.createReadStream(safePath);
@@ -438,12 +440,29 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error('⚠️ [WARN] Rechazo de promesa no capturado en:', promise, 'razón:', reason);
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`=======================================================`);
     console.log(`🏛️  SISTEMA OFICIAL DE VOTACIÓN - PLATO METRÓPOLI`);
     console.log(`📍  GOBIERNO AUTÓNOMO MUNICIPAL DE EL ALTO (GAMEA)`);
-    console.log(`🚀  Servidor activo en: http://localhost:${PORT}`);
-    console.log(`📊  Dashboard General:   http://localhost:${PORT}/dashboard.html`);
+    console.log(`🚀  Servidor central activo en puerto: ${PORT}`);
+    console.log(`💻  Acceso local en este equipo: http://localhost:${PORT}`);
+    console.log(`📺  ENLACES PARA PROYECTAR EN OTRAS PANTALLAS / EQUIPOS (LAN):`);
+    try {
+        const nets = os.networkInterfaces();
+        let foundLan = false;
+        for (const name of Object.keys(nets)) {
+            for (const net of nets[name]) {
+                if (net.family === 'IPv4' && !net.internal) {
+                    console.log(`   👉 Pantalla de Votación: http://${net.address}:${PORT}`);
+                    console.log(`   👉 Pantalla de Dashboard: http://${net.address}:${PORT}/dashboard.html`);
+                    foundLan = true;
+                }
+            }
+        }
+        if (!foundLan) {
+            console.log(`   (Conéctate a una red Wi-Fi o Ethernet para ver la IP de proyección)`);
+        }
+    } catch {}
     console.log(`📜  Especificación SDD:  http://localhost:${PORT}/api/spec.yaml`);
     console.log(`=======================================================`);
 });

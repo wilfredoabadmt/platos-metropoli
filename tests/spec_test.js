@@ -66,6 +66,10 @@ test.before(async () => {
 });
 
 test.after(async () => {
+    try {
+        const { db } = require('../lib/db.js');
+        db.prepare('DELETE FROM votes WHERE voter_uuid LIKE ?').run('voter_test_sdd%');
+    } catch {}
     if (appServer) {
         await new Promise(resolve => appServer.close(resolve));
     }
@@ -193,3 +197,46 @@ test.describe('4. Dashboard Analítico y Métricas en Tiempo Real (SDD-01, SDD-0
         assert.ok(res.data.includes('Nro_Voto;Fecha_Hora_ISO;Plato_Votado;Distrito_Ubicacion'));
     });
 });
+
+test.describe('5. Proyección Multi-Pantalla y Sincronización en Tiempo Real (SDD-06)', () => {
+    test('GET /app.js y /dashboard.js deben responder con no-cache para evitar pantallas desactualizadas', async () => {
+        const resApp = await makeRequest('GET', '/app.js');
+        assert.equal(resApp.statusCode, 200);
+        assert.ok(resApp.headers['cache-control']?.includes('no-cache'));
+
+        const resDash = await makeRequest('GET', '/dashboard.js');
+        assert.equal(resDash.statusCode, 200);
+        assert.ok(resDash.headers['cache-control']?.includes('no-cache'));
+    });
+
+    test('GET /api/stream debe proveer cabeceras SSE para distribución en tiempo real a múltiples pantallas', () => {
+        return new Promise((resolve, reject) => {
+            const req = http.request({
+                hostname: '127.0.0.1',
+                port: PORT,
+                path: '/api/stream',
+                method: 'GET'
+            }, (res) => {
+                assert.equal(res.statusCode, 200);
+                assert.ok(res.headers['content-type']?.includes('text/event-stream'));
+
+                res.on('data', chunk => {
+                    const str = chunk.toString();
+                    if (str.includes('event: init')) {
+                        req.destroy();
+                        resolve();
+                    }
+                });
+            });
+
+            req.on('error', (err) => {
+                // Si se destruye la conexión intencionalmente tras validar, resolvemos
+                if (err.code === 'ECONNRESET' || req.destroyed) return resolve();
+                reject(err);
+            });
+
+            req.end();
+        });
+    });
+});
+
