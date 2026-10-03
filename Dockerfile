@@ -10,6 +10,9 @@ COPY package.json ./
 # Instalar dependencias si existiesen en package.json
 RUN npm install --omit=dev || true
 
+# Instalar curl para healthchecks robustos en Coolify y Docker
+RUN apk add --no-cache curl
+
 # Copiar el código de la aplicación
 COPY . .
 
@@ -23,9 +26,10 @@ ENV NODE_ENV=production
 # Declarar volumen para persistencia de la base de datos en Coolify
 VOLUME ["/app/data"]
 
-# Monitoreo de salud para Docker y Coolify
-HEALTHCHECK --interval=20s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:3000/api/health || exit 1
+# Monitoreo de salud para Docker y Coolify (usando curl con fallback a Node fetch nativo)
+HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=3 \
+  CMD curl -f http://127.0.0.1:3000/api/health || node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
 
 # Comando de inicio
 CMD ["node", "server.js"]
