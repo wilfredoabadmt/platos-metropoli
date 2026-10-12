@@ -51,9 +51,13 @@ function connectDashboardSse() {
             loadDashboardData();
         });
 
-        // Actualización instantánea sincronizada al segundo con las demás pantallas
+        let sseDebounceTimer = null;
+        // Actualización instantánea sincronizada con debounce de 350ms para ráfagas concurrentes
         dashboardSseSource.addEventListener('vote_update', () => {
-            loadDashboardData();
+            if (sseDebounceTimer) clearTimeout(sseDebounceTimer);
+            sseDebounceTimer = setTimeout(() => {
+                loadDashboardData();
+            }, 350);
         });
 
         dashboardSseSource.onerror = () => {
@@ -75,6 +79,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnRefresh) {
         btnRefresh.addEventListener('click', () => {
             triggerManualRefresh();
+        });
+    }
+
+    // Exportación con soporte de token administrativo (Shift + clic)
+    const btnExportCsv = document.getElementById('btn-export-csv');
+    if (btnExportCsv) {
+        btnExportCsv.addEventListener('click', (e) => {
+            if (e.shiftKey || e.ctrlKey) {
+                e.preventDefault();
+                const token = prompt('Ingrese el Token de Administración (para incluir IP de auditoría):');
+                if (token) {
+                    window.location.href = `/api/export/csv?token=${encodeURIComponent(token.trim())}`;
+                }
+            }
         });
     }
 
@@ -150,12 +168,13 @@ function renderKpis(stats) {
         }
     }
 
-    // Estadísticas de móvil
+    // Estadísticas de participación móvil y dispositivos táctiles
     const mobileData = stats.deviceVotes.find(d => d.device === 'Móvil');
-    const mobilePct = mobileData ? mobileData.percentage : 0;
-    const mobileCount = mobileData ? mobileData.votes : 0;
+    const tabletData = stats.deviceVotes.find(d => d.device === 'Tablet');
+    const mobileCount = (mobileData ? mobileData.votes : 0) + (tabletData ? tabletData.votes : 0);
+    const mobilePct = stats.totalVotes > 0 ? Number(((mobileCount / stats.totalVotes) * 100).toFixed(1)) : 0;
     if (kpiMobilePct) kpiMobilePct.textContent = `${mobilePct}%`;
-    if (kpiMobileStat) kpiMobileStat.textContent = `${mobileCount} votos desde smartphones`;
+    if (kpiMobileStat) kpiMobileStat.textContent = `${mobileCount} votos desde smartphones/tablets`;
 }
 
 // Renderizar o actualizar los gráficos con Chart.js

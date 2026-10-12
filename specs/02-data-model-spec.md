@@ -58,3 +58,8 @@ CREATE INDEX IF NOT EXISTS idx_votes_voter_dish ON votes(voter_uuid, dish_id);
    * Se programa un checkpoint de WAL periódico (`PRAGMA wal_checkpoint(PASSIVE)`) cada 5 minutos o al alcanzar 1,000 páginas para evitar el crecimiento descontrolado de `votacion.db-wal`.
    * En apagado limpio del proceso (`SIGINT`, `SIGTERM`), se invoca `PRAGMA wal_checkpoint(TRUNCATE)` y cierre formal de la conexión a la base de datos.
 4. **Semillas Oficiales:** Si la tabla `dishes` está vacía, se inicializan automáticamente los 6 platos oficiales.
+5. **Pureza de Datos y Transparencia Electoral (Anti-Simulación):**
+   * Queda terminantemente prohibida la generación de votos ficticios, aleatorios o sintéticos.
+   * La base de datos registra única y exclusivamente la voluntad emitida por personas reales.
+   * Todos los reportes analíticos aplican la conversión a la hora oficial de Bolivia (`strftime(..., '-4 hours')`).
+   * Los distritos se registran bajo su denominación canónica normalizada.

@@ -25,6 +25,7 @@ El servidor debe resolver la IP real del cliente siguiendo la jerarquía estánd
 * El formulario incluye campos invisibles para usuarios humanos (`hp_field`, `hp_code`).
 * Los bots de spam y scrapers suelen autocompletar todos los inputs disponibles. Si el payload contiene algún valor en estos campos, la solicitud es rechazada inmediatamente con código 400 sin procesar.
 
-### 2.4 Control de Acceso Administrativo a Exportaciones
-* El endpoint `/api/export/csv` contiene datos sensibles (direcciones IP, horas exactas).
-* Se habilita verificación por cabecera `X-Admin-Token` o parámetro `?token=...` coincidente con `ADMIN_EXPORT_TOKEN` (definible vía variable de entorno, con clave por defecto para auditoría interna).
+### 2.4 Control de Acceso y Modelo Dual de Exportación
+* El endpoint `/api/export/csv` implementa un modelo de datos abiertos y transparencia ciudadana con protección de privacidad:
+  * **Descarga Pública:** Accesible directamente desde el dashboard. Incluye todas las variables del sufragio (plato, distrito, ciudad, dispositivo, marca de tiempo), pero enmascara la dirección IP (`Protegida (Privacidad)`) para resguardar la identidad de los votantes.
+  * **Descarga de Auditoría Completa:** Requiere cabecera `X-Admin-Token` o parámetro `?token=...` coincidente con `ADMIN_TOKEN` para revelar las direcciones IP de origen con propósitos de fiscalización técnica oficial.

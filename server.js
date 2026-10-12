@@ -68,6 +68,11 @@ function cleanOldWindows() {
             ipCooldownMap.delete(ip);
         }
     }
+    for (const [uuid, timestamp] of voterCooldownMap.entries()) {
+        if (now - timestamp > 30000) {
+            voterCooldownMap.delete(uuid);
+        }
+    }
 }
 setInterval(cleanOldWindows, 30000);
 
@@ -212,13 +217,23 @@ const server = http.createServer(async (req, res) => {
                 return sendJson(res, 400, { success: false, error: 'Se requiere el ID del plato.' });
             }
 
-            // Verificar cooldown de ráfaga inmediata por IP (excepto en test automatizado)
+            // Verificar cooldown de ráfaga inmediata por dispositivo y por IP (SDD-04)
             if (process.env.NODE_ENV !== 'test') {
+                if (voterUuid) {
+                    const lastVoterVote = voterCooldownMap.get(voterUuid);
+                    if (lastVoterVote && (now - lastVoterVote < COOLDOWN_MS)) {
+                        return sendJson(res, 429, {
+                            success: false,
+                            error: 'Por favor espera un segundo antes de enviar otro voto.'
+                        });
+                    }
+                }
+
                 const lastIpVote = ipCooldownMap.get(clientIp);
-                if (lastIpVote && (now - lastIpVote < COOLDOWN_MS)) {
+                if (lastIpVote && (now - lastIpVote < 500)) {
                     return sendJson(res, 429, {
                         success: false,
-                        error: 'Por favor espera un segundo antes de enviar otro voto.'
+                        error: 'Por favor espera un momento antes de enviar otro voto.'
                     });
                 }
 
@@ -255,6 +270,7 @@ const server = http.createServer(async (req, res) => {
             });
 
             ipCooldownMap.set(clientIp, now);
+            if (voterUuid) voterCooldownMap.set(voterUuid, now);
 
             // Transmisión instantánea SSE a todos los ciudadanos y pantallas activas
             broadcastSse('vote_update', {
@@ -292,21 +308,15 @@ const server = http.createServer(async (req, res) => {
         }
     }
 
-    // 5. Exportar reporte CSV con control de autorización
+    // 5. Exportar reporte CSV (Transparencia pública con IP protegida, o auditoría administrativa completa con token)
     if (req.method === 'GET' && pathname === '/api/export/csv') {
         try {
             const reqToken = req.headers['x-admin-token'] || reqUrl.searchParams.get('token');
             const adminToken = process.env.ADMIN_TOKEN || 'gamea_metropoli_2026';
+            const isAuthorizedAdmin = (reqToken === adminToken) || (process.env.NODE_ENV !== 'production');
 
-            // Verificación administrativa para proteger datos de los ciudadanos
-            if (process.env.NODE_ENV === 'production' && reqToken !== adminToken) {
-                return sendJson(res, 401, {
-                    success: false,
-                    error: 'Acceso no autorizado al reporte oficial. Proporcione cabecera X-Admin-Token o parámetro ?token=...'
-                });
-            }
-
-            const rows = dbService.getAllVotesForExport();
+            // El reporte público protege la privacidad ciudadana; el reporte con token incluye la IP de auditoría
+            const rows = dbService.getAllVotesForExport(isAuthorizedAdmin);
             if (!rows.length) {
                 res.writeHead(200, { 'Content-Type': 'text/plain; charset=UTF-8' });
                 return res.end('No hay registros de votación disponibles.');

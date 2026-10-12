@@ -4,71 +4,71 @@
  * Lógica principal de votación conectada a Base de Datos en Tiempo Real
  */
 
-// Lista de respaldo en caso de funcionamiento sin conexión o estático
+// Lista de respaldo limpia en caso de funcionamiento sin conexión inicial
 const DEFAULT_DISHES = [
     {
         id: 'fiambre',
         name: 'Fiambre',
         description: 'Tradicional plato alteño, con asado, queso frito, huevo duro, fideo y papa.',
         image: 'assets/fiambre.jpg',
-        votes: 68
+        votes: 0
     },
     {
         id: 'aji-fideo',
         name: 'Ají de Fideo con Chuño',
         description: 'Delicioso fideo tostado bañado en ají colorado, acompañado de chuño y carne.',
         image: 'assets/aji-fideo.jpg',
-        votes: 139
+        votes: 0
     },
     {
         id: 'apthapi',
         name: 'Apthapi Andino',
         description: 'Comida comunitaria ancestral con papa, chuño, habas, queso, huevo y carnes variadas.',
         image: 'assets/apthapi.jpg',
-        votes: 141
+        votes: 0
     },
     {
         id: 'wallake',
         name: 'Wallake',
         description: 'Caldo de pescado karachi con ají amarillo, papa, chuño y muña.',
         image: 'assets/wallake.jpg',
-        votes: 103
+        votes: 0
     },
     {
         id: 'pesque',
         name: 'Pesque de Quinua',
         description: 'Nutritivo puré de quinua real preparado con leche y abundante queso.',
         image: 'assets/pesque.jpg',
-        votes: 97
+        votes: 0
     },
     {
         id: 'sopa-fideo',
         name: 'Sopita de Fideo',
         description: 'Clásica y reconfortante sopa con carne, verduras y fideo tostado. La "sajra hora".',
         image: 'assets/sopa-fideo.jpg',
-        votes: 100
+        votes: 0
     }
 ];
 
-// Opciones de Distritos de El Alto y procedencia
+// Opciones Oficiales de Distritos de El Alto y procedencia (Con nombres canónicos normalizados)
 const DISTRICT_OPTIONS = [
-    { id: 'D1', label: 'Distrito 1', sub: 'Satélite / Tejada' },
-    { id: 'D2', label: 'Distrito 2', sub: 'Villa Dolores / Bolívar' },
-    { id: 'D3', label: 'Distrito 3', sub: 'Villa Adela / Cosmos 79' },
-    { id: 'D4', label: 'Distrito 4', sub: 'Río Seco / Yunguyo' },
-    { id: 'D5', label: 'Distrito 5', sub: 'Huayna Potosí' },
-    { id: 'D6', label: 'Distrito 6', sub: '16 de Julio / Ballivián' },
-    { id: 'D7', label: 'Distrito 7', sub: 'San Roque' },
-    { id: 'D8', label: 'Distrito 8', sub: 'Senkata / Tarapacá' },
-    { id: 'D9', label: 'Distrito 9', sub: 'Pomamaya' },
-    { id: 'D10', label: 'Distrito 10', sub: 'Amachuma' },
-    { id: 'D11', label: 'Distrito 11', sub: 'San Pedro de Curva' },
-    { id: 'D12', label: 'Distrito 12', sub: 'Alto Chijini' },
-    { id: 'D13', label: 'Distrito 13', sub: 'Charapaqui' },
-    { id: 'D14', label: 'Distrito 14', sub: 'Bautista Saavedra' },
-    { id: 'LPZ', label: 'Ciudad de La Paz', sub: 'Centro / Sur / Laderas' },
-    { id: 'BOL', label: 'Otra Ciudad de Bolivia', sub: 'Cbb / Scz / Oruro / etc.' },
-    { id: 'EXT', label: 'Fuera del País', sub: 'Residentes en el exterior' }
+    { id: 'D1', label: 'Distrito 1', sub: 'Ciudad Satélite / Tejada', fullName: 'Distrito 1 (Ciudad Satélite / Tejada)' },
+    { id: 'D2', label: 'Distrito 2', sub: 'Villa Dolores / Bolívar', fullName: 'Distrito 2 (Villa Dolores / Bolívar)' },
+    { id: 'D3', label: 'Distrito 3', sub: 'Villa Adela / Cosmos 79', fullName: 'Distrito 3 (Villa Adela / Cosmos 79)' },
+    { id: 'D4', label: 'Distrito 4', sub: 'Río Seco / Yunguyo', fullName: 'Distrito 4 (Río Seco / Yunguyo)' },
+    { id: 'D5', label: 'Distrito 5', sub: 'Huayna Potosí', fullName: 'Distrito 5 (Huayna Potosí)' },
+    { id: 'D6', label: 'Distrito 6', sub: '16 de Julio / Ballivián', fullName: 'Distrito 6 (16 de Julio / Ballivián)' },
+    { id: 'D7', label: 'Distrito 7', sub: 'San Roque', fullName: 'Distrito 7 (San Roque)' },
+    { id: 'D8', label: 'Distrito 8', sub: 'Senkata / Tarapacá', fullName: 'Distrito 8 (Senkata / Tarapacá)' },
+    { id: 'D9', label: 'Distrito 9', sub: 'Pomamaya', fullName: 'Distrito 9 (Pomamaya)' },
+    { id: 'D10', label: 'Distrito 10', sub: 'Amachuma', fullName: 'Distrito 10 (Amachuma)' },
+    { id: 'D11', label: 'Distrito 11', sub: 'San Pedro de Curva', fullName: 'Distrito 11 (San Pedro de Curva)' },
+    { id: 'D12', label: 'Distrito 12', sub: 'Alto Chijini', fullName: 'Distrito 12 (Alto Chijini)' },
+    { id: 'D13', label: 'Distrito 13', sub: 'Charapaqui', fullName: 'Distrito 13 (Charapaqui)' },
+    { id: 'D14', label: 'Distrito 14', sub: 'Bautista Saavedra', fullName: 'Distrito 14 (Bautista Saavedra)' },
+    { id: 'LPZ', label: 'Ciudad de La Paz', sub: 'Centro / Sur / Laderas', fullName: 'Ciudad de La Paz' },
+    { id: 'BOL', label: 'Otra Ciudad de Bolivia', sub: 'Interior del país', fullName: 'Otra Ciudad de Bolivia' },
+    { id: 'EXT', label: 'Fuera del País', sub: 'Residentes en el exterior', fullName: 'Fuera del País' }
 ];
 
 // Helpers de Cookies seguras para WebView (TikTok / Facebook)
@@ -457,8 +457,8 @@ function renderDistrictGrid() {
     districtGrid.innerHTML = '';
 
     DISTRICT_OPTIONS.forEach(opt => {
-        const fullDistrictName = `${opt.label} (${opt.sub})`;
-        const isSelected = selectedDistrict.startsWith(opt.label);
+        const fullDistrictName = opt.fullName || `${opt.label} (${opt.sub})`;
+        const isSelected = selectedDistrict.startsWith(opt.label) || selectedDistrict === fullDistrictName;
 
         const btn = document.createElement('button');
         btn.type = 'button';
