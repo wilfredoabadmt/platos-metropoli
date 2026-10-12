@@ -107,6 +107,20 @@ function getOrCreateVoterUuid() {
     setCookie('gamea_voter_uuid', uuid, 90);
     return uuid;
 }
+
+// Soporte para pruebas y desarrollo: ?reset=1 o ?reset_local=1 limpia votos locales
+if (typeof window !== 'undefined' && window.location && window.location.search) {
+    if (/[?&](reset|test|reset_local)=1/i.test(window.location.search)) {
+        try {
+            localStorage.removeItem('gamea_voted_dishes');
+            localStorage.removeItem('gamea_pending_votes');
+            localStorage.removeItem('gamea_voter_uuid');
+            document.cookie = 'gamea_voter_uuid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            console.log('🔄 [GAMEA] Almacenamiento local reiniciado para pruebas.');
+        } catch { }
+    }
+}
+
 const voterUuid = getOrCreateVoterUuid();
 
 // =============================================================================
@@ -303,10 +317,10 @@ function startPollingFallback() {
     pollFallbackTimer = setInterval(fetchLiveDishes, 10000);
 }
 
-// Obtener platos y votos reales desde la API
+// Obtener platos y votos reales desde la API (con cache-busting estricto)
 async function fetchLiveDishes() {
     try {
-        const response = await fetch('/api/dishes', { cache: 'no-store' });
+        const response = await fetch(`/api/dishes?_t=${Date.now()}`, { cache: 'no-store' });
         if (!response.ok) throw new Error('Error al conectar con el servidor');
         const data = await response.json();
         if (data.success && Array.isArray(data.dishes) && data.dishes.length > 0) {

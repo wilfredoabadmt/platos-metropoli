@@ -424,10 +424,18 @@ const server = http.createServer(async (req, res) => {
         const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
         const isAppCode = ['.html', '.js', '.css'].includes(ext);
-        res.writeHead(200, {
+        const headers = {
             'Content-Type': contentType,
-            'Cache-Control': isAppCode ? 'no-cache, must-revalidate' : 'public, max-age=86400'
-        });
+            'Cache-Control': isAppCode 
+                ? 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' 
+                : 'public, max-age=86400'
+        };
+        if (isAppCode) {
+            headers['Pragma'] = 'no-cache';
+            headers['Expires'] = '0';
+            headers['Surrogate-Control'] = 'no-store';
+        }
+        res.writeHead(200, headers);
 
         const stream = fs.createReadStream(safePath);
         stream.on('error', (streamErr) => {

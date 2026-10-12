@@ -113,12 +113,13 @@ function triggerManualRefresh() {
     loadDashboardData();
 }
 
-// Cargar todos los datos del dashboard desde los endpoints de la API
+// Cargar todos los datos del dashboard desde los endpoints de la API (con cache-busting estricto)
 async function loadDashboardData() {
     try {
+        const now = Date.now();
         const [statsRes, recentRes] = await Promise.all([
-            fetch('/api/dashboard/stats', { cache: 'no-store' }),
-            fetch('/api/dashboard/recent-votes?limit=50', { cache: 'no-store' })
+            fetch(`/api/dashboard/stats?_t=${now}`, { cache: 'no-store' }),
+            fetch(`/api/dashboard/recent-votes?limit=50&_t=${now}`, { cache: 'no-store' })
         ]);
 
         if (statsRes.ok) {
@@ -126,6 +127,10 @@ async function loadDashboardData() {
             if (statsData.success && statsData.stats) {
                 renderKpis(statsData.stats);
                 renderCharts(statsData.stats);
+                const syncStatusText = document.getElementById('sync-status-text');
+                if (syncStatusText) {
+                    syncStatusText.textContent = `En vivo: ${new Date().toLocaleTimeString('es-BO')} (SSE Conectado • Datos Oficiales)`;
+                }
             }
         } else {
             console.warn(`Respuesta no exitosa de /api/dashboard/stats: ${statsRes.status}`);
