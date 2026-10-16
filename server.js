@@ -423,17 +423,25 @@ const server = http.createServer(async (req, res) => {
         const ext = path.extname(safePath).toLowerCase();
         const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
-        const isAppCode = ['.html', '.js', '.css'].includes(ext);
+        const isHtml = ext === '.html';
+        const isAppCode = ['.js', '.css'].includes(ext);
         const headers = {
             'Content-Type': contentType,
-            'Cache-Control': isAppCode 
-                ? 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' 
-                : 'public, max-age=86400'
+            'Vary': 'Accept-Encoding'
         };
-        if (isAppCode) {
+        if (isHtml) {
+            // HTML nunca debe cachearse: evita 503 fantasma tras redeploys
+            headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
             headers['Pragma'] = 'no-cache';
             headers['Expires'] = '0';
             headers['Surrogate-Control'] = 'no-store';
+        } else if (isAppCode) {
+            // JS/CSS usan cache-busting por query string (?v=), max-age corto como respaldo
+            headers['Cache-Control'] = 'no-cache, must-revalidate, max-age=0';
+            headers['Pragma'] = 'no-cache';
+        } else {
+            // Imágenes y otros assets estáticos pueden cachearse
+            headers['Cache-Control'] = 'public, max-age=86400, immutable';
         }
         res.writeHead(200, headers);
 
