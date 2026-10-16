@@ -125,17 +125,20 @@ function parseJsonBody(req) {
 }
 
 // Helper para responder JSON con cabeceras de seguridad
-function sendJson(res, statusCode, data) {
+function sendJson(res, statusCode, data, reqMethod = 'GET') {
     const jsonStr = JSON.stringify(data);
     res.writeHead(statusCode, {
         'Content-Type': 'application/json; charset=UTF-8',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, HEAD',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Cache-Control': 'no-store, no-cache, must-revalidate',
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'SAMEORIGIN'
     });
+    if (reqMethod === 'HEAD') {
+        return res.end();
+    }
     res.end(jsonStr);
 }
 
@@ -145,7 +148,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'OPTIONS') {
         res.writeHead(204, {
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, HEAD',
             'Access-Control-Allow-Headers': 'Content-Type'
         });
         return res.end();
@@ -156,6 +159,8 @@ const server = http.createServer(async (req, res) => {
     if (pathname.length > 1 && pathname.endsWith('/')) {
         pathname = pathname.replace(/\/+$/, '');
     }
+
+    const isGetOrHead = req.method === 'GET' || req.method === 'HEAD';
 
     // ==========================================
     // RUTAS DE LA API REST Y TIEMPO REAL
@@ -170,6 +175,7 @@ const server = http.createServer(async (req, res) => {
             'Access-Control-Allow-Origin': '*',
             'X-Accel-Buffering': 'no'
         });
+        res.write(': ok\n\n');
 
         // Enviar estado inicial del ranking al conectar
         try {
@@ -181,19 +187,22 @@ const server = http.createServer(async (req, res) => {
 
         sseClients.add(res);
 
-        req.on('close', () => {
+        const cleanup = () => {
             sseClients.delete(res);
-        });
+        };
+        req.on('close', cleanup);
+        req.on('error', cleanup);
+        res.on('error', cleanup);
         return;
     }
 
     // 1. Obtener platos y sus votos actuales
-    if (req.method === 'GET' && pathname === '/api/dishes') {
+    if (isGetOrHead && pathname === '/api/dishes') {
         try {
             const dishes = dbService.getDishesWithVotes();
-            return sendJson(res, 200, { success: true, dishes });
+            return sendJson(res, 200, { success: true, dishes }, req.method);
         } catch (err) {
-            return sendJson(res, 500, { success: false, error: err.message });
+            return sendJson(res, 500, { success: false, error: err.message }, req.method);
         }
     }
 
@@ -288,28 +297,28 @@ const server = http.createServer(async (req, res) => {
     }
 
     // 3. Estadísticas completas para el Dashboard
-    if (req.method === 'GET' && pathname === '/api/dashboard/stats') {
+    if (isGetOrHead && pathname === '/api/dashboard/stats') {
         try {
             const stats = dbService.getDashboardStats();
-            return sendJson(res, 200, { success: true, stats });
+            return sendJson(res, 200, { success: true, stats }, req.method);
         } catch (err) {
-            return sendJson(res, 500, { success: false, error: err.message });
+            return sendJson(res, 500, { success: false, error: err.message }, req.method);
         }
     }
 
     // 4. Últimos votos en vivo
-    if (req.method === 'GET' && pathname === '/api/dashboard/recent-votes') {
+    if (isGetOrHead && pathname === '/api/dashboard/recent-votes') {
         try {
             const limit = Math.min(100, Math.max(1, parseInt(reqUrl.searchParams.get('limit'), 10) || 50));
             const votes = dbService.getRecentVotes(limit);
-            return sendJson(res, 200, { success: true, votes });
+            return sendJson(res, 200, { success: true, votes }, req.method);
         } catch (err) {
-            return sendJson(res, 500, { success: false, error: err.message });
+            return sendJson(res, 500, { success: false, error: err.message }, req.method);
         }
     }
 
     // 5. Exportar reporte CSV (Transparencia pública con IP protegida, o auditoría administrativa completa con token)
-    if (req.method === 'GET' && pathname === '/api/export/csv') {
+    if (isGetOrHead && pathname === '/api/export/csv') {
         try {
             const reqToken = req.headers['x-admin-token'] || reqUrl.searchParams.get('token');
             const adminToken = process.env.ADMIN_TOKEN || 'gamea_metropoli_2026';
@@ -318,8 +327,8 @@ const server = http.createServer(async (req, res) => {
             // El reporte público protege la privacidad ciudadana; el reporte con token incluye la IP de auditoría
             const rows = dbService.getAllVotesForExport(isAuthorizedAdmin);
             if (!rows.length) {
-                res.writeHead(200, { 'Content-Type': 'text/plain; charset=UTF-8' });
-                return res.end('No hay registros de votación disponibles.');
+                res.writeHead(200, { 'Content-Type': 'text/plain; charset=UTF-8', 'Cache-Control': 'no-cache' });
+                return res.end(req.method === 'HEAD' ? undefined : 'No hay registros de votación disponibles.');
             }
 
             const headers = Object.keys(rows[0]);
@@ -343,27 +352,33 @@ const server = http.createServer(async (req, res) => {
                 'Content-Disposition': 'attachment; filename="reporte_votacion_platos_metropoli_elalto.csv"',
                 'Cache-Control': 'no-cache'
             });
+            if (req.method === 'HEAD') {
+                return res.end();
+            }
             return res.end(csvContent);
         } catch (err) {
-            return sendJson(res, 500, { success: false, error: err.message });
+            return sendJson(res, 500, { success: false, error: err.message }, req.method);
         }
     }
 
     // 6. Servir Especificación OpenAPI 3.1 (SDD-03)
-    if (req.method === 'GET' && (pathname === '/api/spec.yaml' || pathname === '/api/spec')) {
+    if (isGetOrHead && (pathname === '/api/spec.yaml' || pathname === '/api/spec')) {
         const specPath = path.join(__dirname, 'specs', '03-api-contract-spec.yaml');
         if (fs.existsSync(specPath)) {
             res.writeHead(200, {
                 'Content-Type': 'text/yaml; charset=UTF-8',
                 'Access-Control-Allow-Origin': '*'
             });
+            if (req.method === 'HEAD') {
+                return res.end();
+            }
             return fs.createReadStream(specPath).pipe(res);
         }
-        return sendJson(res, 404, { success: false, error: 'Especificación OpenAPI no encontrada.' });
+        return sendJson(res, 404, { success: false, error: 'Especificación OpenAPI no encontrada.' }, req.method);
     }
 
     // 7. Health Check enriquecido
-    if (req.method === 'GET' && pathname === '/api/health') {
+    if (isGetOrHead && pathname === '/api/health') {
         let totalVotes = 0;
         try {
             totalVotes = dbService.getRankingSummary().totalVotes;
@@ -374,7 +389,7 @@ const server = http.createServer(async (req, res) => {
             time: new Date().toISOString(),
             uptime: Math.round(process.uptime()),
             totalVotes
-        });
+        }, req.method);
     }
 
     // ==========================================
@@ -390,13 +405,19 @@ const server = http.createServer(async (req, res) => {
 
     // Prevenir Directory Traversal
     if (!safePath.startsWith(PUBLIC_DIR)) {
-        res.writeHead(403, { 'Content-Type': 'text/plain; charset=UTF-8' });
+        res.writeHead(403, { 'Content-Type': 'text/plain; charset=UTF-8', 'Cache-Control': 'no-store' });
         return res.end('403 Prohibido');
     }
 
     fs.stat(safePath, (err, stats) => {
         if (err || !stats.isFile()) {
-            res.writeHead(404, { 'Content-Type': 'text/html; charset=UTF-8' });
+            res.writeHead(404, {
+                'Content-Type': 'text/html; charset=UTF-8',
+                'Cache-Control': 'no-store, no-cache, must-revalidate'
+            });
+            if (req.method === 'HEAD') {
+                return res.end();
+            }
             return res.end(`
                 <!DOCTYPE html>
                 <html lang="es">
@@ -435,6 +456,7 @@ const server = http.createServer(async (req, res) => {
             headers['Pragma'] = 'no-cache';
             headers['Expires'] = '0';
             headers['Surrogate-Control'] = 'no-store';
+            headers['Clear-Site-Data'] = '"cache"';
         } else if (isAppCode) {
             // JS/CSS usan cache-busting por query string (?v=), max-age corto como respaldo
             headers['Cache-Control'] = 'no-cache, must-revalidate, max-age=0';
@@ -445,11 +467,15 @@ const server = http.createServer(async (req, res) => {
         }
         res.writeHead(200, headers);
 
+        if (req.method === 'HEAD') {
+            return res.end();
+        }
+
         const stream = fs.createReadStream(safePath);
         stream.on('error', (streamErr) => {
             console.error('Error al transmitir archivo estático:', streamErr.message);
             if (!res.headersSent) {
-                res.writeHead(500, { 'Content-Type': 'text/plain; charset=UTF-8' });
+                res.writeHead(500, { 'Content-Type': 'text/plain; charset=UTF-8', 'Cache-Control': 'no-store' });
                 res.end('500 Error Interno');
             }
         });

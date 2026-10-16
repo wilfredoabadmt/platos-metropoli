@@ -7,6 +7,19 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <script>
+        // Limpieza preventiva de Service Workers o cachés obsoletas que puedan causar errores 503
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+                for (var i = 0; i < regs.length; i++) { regs[i].unregister(); }
+            }).catch(function() {});
+        }
+        if ('caches' in window) {
+            caches.keys().then(function(keys) {
+                for (var i = 0; i < keys.length; i++) { caches.delete(keys[i]); }
+            }).catch(function() {});
+        }
+    </script>
     <title>Dashboard Oficial - Elección del Plato Metrópoli El Alto</title>
     <meta name="description"
         content="Panel institucional de seguimiento en tiempo real de la votación del Plato Metrópoli. Monitoreo de actividad, líderes gastronómicos y procedencia distrital en El Alto.">
@@ -26,8 +39,8 @@
     <link rel="shortcut icon" href="favicon.ico">
 
     <!-- Estilos del Dashboard (Con cache-busting) -->
-    <link rel="stylesheet" href="styles.css?v=20261016">
-    <link rel="stylesheet" href="dashboard.css?v=20261016">
+    <link rel="stylesheet" href="styles.css?v=20261016_v2">
+    <link rel="stylesheet" href="dashboard.css?v=20261016_v2">
 </head>
 
 <body class="dashboard-body">
@@ -262,7 +275,7 @@
     </footer>
 
     <!-- Lógica del Dashboard (Con cache-busting para sincronización instantánea) -->
-    <script src="dashboard.js?v=20261016"></script>
+    <script src="dashboard.js?v=20261016_v2"></script>
 </body>
 
 </html>

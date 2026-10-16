@@ -7,6 +7,19 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <script>
+        // Limpieza preventiva de Service Workers o cachés obsoletas que puedan causar errores 503
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+                for (var i = 0; i < regs.length; i++) { regs[i].unregister(); }
+            }).catch(function() {});
+        }
+        if ('caches' in window) {
+            caches.keys().then(function(keys) {
+                for (var i = 0; i < keys.length; i++) { caches.delete(keys[i]); }
+            }).catch(function() {});
+        }
+    </script>
     <title>Elección del Plato Metrópoli - El Alto</title>
     <meta name="description"
         content="Participa en la elección del Plato Metrópoli, la primera versión del Plato Bandera de la ciudad de El Alto. ¡Vota por tu plato favorito en tiempo real!">
@@ -33,7 +46,7 @@
     <link rel="shortcut icon" href="favicon.ico">
 
     <!-- Custom Styles (Con control de versión y cache-busting) -->
-    <link rel="stylesheet" href="styles.css?v=20261016">
+    <link rel="stylesheet" href="styles.css?v=20261016_v2">
 </head>
 
 <body>
@@ -234,7 +247,7 @@
     </aside>
 
     <!-- Custom Logic (Con cache-busting para sincronización instantánea) -->
-    <script src="app.js?v=20261016"></script>
+    <script src="app.js?v=20261016_v2"></script>
 </body>
 
 </html>

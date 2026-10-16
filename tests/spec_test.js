@@ -91,6 +91,19 @@ test.describe('1. Verificación de Salud e Integridad del Servicio (SDD-03)', ()
         assert.ok(res.data.includes('openapi: 3.1.0'));
         assert.ok(res.data.includes('Plato Metrópoli'));
     });
+
+    test('HEAD /api/health debe responder 200 sin cuerpo', async () => {
+        const res = await makeRequest('HEAD', '/api/health');
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.data, '');
+    });
+
+    test('GET / debe incluir Clear-Site-Data: "cache" y Cache-Control no-store', async () => {
+        const res = await makeRequest('GET', '/');
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.headers['clear-site-data'], '"cache"');
+        assert.ok(res.headers['cache-control']?.includes('no-store'));
+    });
 });
 
 test.describe('2. Catálogo Oficial de Platos Candidatos (SDD-01)', () => {

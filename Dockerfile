@@ -31,5 +31,5 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=3 \
   CMD curl -f http://127.0.0.1:3000/api/health || node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 
-# Comando de inicio
-CMD ["node", "server.js"]
+# Comando de inicio con soporte de headers HTTP de hasta 64KB (previene 431/503 con cookies institucionales)
+CMD ["node", "--max-http-header-size=65536", "server.js"]
