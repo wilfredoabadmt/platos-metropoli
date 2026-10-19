@@ -9,3 +9,4 @@ yarn-error.log*
 # Archivos temporales de SQLite WAL
 data/*.db-shm
 data/*.db-wal
+data/backup_*.csv

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/export/
+
+# Elección Oficial del Plato Metrópoli - El Alto 2026
+# Gobierno Autónomo Municipal de El Alto (GAMEA)

@@ -154,6 +154,18 @@ const server = http.createServer(async (req, res) => {
         return res.end();
     }
 
+    const hostHeader = (req.headers.host || '').toLowerCase();
+    // Redirigir www a dominio canónico sin www (evita errores 503 por discrepancia de proxy)
+    if (hostHeader.startsWith('www.')) {
+        const canonicalHost = hostHeader.replace(/^www\./, '');
+        const protocol = req.headers['x-forwarded-proto'] || 'https';
+        res.writeHead(301, {
+            'Location': `${protocol}://${canonicalHost}${req.url}`,
+            'Cache-Control': 'no-cache'
+        });
+        return res.end();
+    }
+
     const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost:3000'}`);
     let pathname = reqUrl.pathname;
     if (pathname.length > 1 && pathname.endsWith('/')) {

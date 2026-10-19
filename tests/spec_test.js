@@ -104,6 +104,18 @@ test.describe('1. Verificación de Salud e Integridad del Servicio (SDD-03)', ()
         assert.equal(res.headers['clear-site-data'], '"cache"');
         assert.ok(res.headers['cache-control']?.includes('no-store'));
     });
+
+    test('GET /robots.txt debe responder 200 con formato text/plain', async () => {
+        const res = await makeRequest('GET', '/robots.txt');
+        assert.equal(res.statusCode, 200);
+        assert.ok(res.data.includes('User-agent: *'));
+    });
+
+    test('Petición con Host www.elplatometropoli.elalto.gob.bo debe redirigir con 301', async () => {
+        const res = await makeRequest('GET', '/', null, { 'Host': 'www.elplatometropoli.elalto.gob.bo' });
+        assert.equal(res.statusCode, 301);
+        assert.ok(res.headers['location']?.includes('elplatometropoli.elalto.gob.bo'));
+    });
 });
 
 test.describe('2. Catálogo Oficial de Platos Candidatos (SDD-01)', () => {
